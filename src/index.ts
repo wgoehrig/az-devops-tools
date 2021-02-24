@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { promptToConfirm, runAzCommand } from "./MiscUtils";
+import { promptToConfirm, runAzCommand, runAzParallel } from "./MiscUtils";
 import { printTable } from "./TableUtils";
 import { AzVarGroupJson, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCollection";
 import { findChanges, printChangeSummary } from "./VarGroupEditing";
@@ -13,6 +13,7 @@ require('yargonaut')
 .helpStyle('cyan')
 .errorsStyle('red.bold');
 import yargs = require("yargs");
+import ora = require("ora");
 
 // tslint:disable: no-console
 yargs.strict(true)
@@ -48,15 +49,17 @@ yargs.strict(true)
   .demandCommand()
   .argv;
 
-function getVarGroups(prefix?: string, outDir?: string, silent = false) {
-  const groups: AzVarGroupJson[] = runAzCommand([
+async function getVarGroups(prefix?: string, outDir?: string, silent = false) {
+  const spinner = ora(chalk`Running {bold az pipelines variable-group list} ...`).start();
+  const groups: AzVarGroupJson[] = await runAzCommand([
     "pipelines",
     "variable-group",
     "list",
     "--only-show-errors",
     "--query",
-    `"sort_by([?contains(@.name, '${prefix}')==\`true\`],&name)"`,
+    `"sort_by([?contains(@.name, '${prefix}')],&name)"`,
   ]);
+  spinner.stop();
 
   const collection = new VarGroupCollection();
   collection.addGroups(prefix!, groups);
@@ -76,7 +79,7 @@ function getVarGroups(prefix?: string, outDir?: string, silent = false) {
 }
 
 async function updateVarGroups(prefix: string, yamlFile: string) {
-  const currentVals = getVarGroups(prefix, undefined, true);
+  const currentVals = await getVarGroups(prefix, undefined, true);
   const newVals = VarGroupCollection.fromYaml(fs.readFileSync(yamlFile).toString());
 
   const changes = findChanges(currentVals, newVals);
@@ -91,7 +94,7 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
       .filter(([_n, value]) => !(value instanceof SecretVal))
       .map(([name, value]) => `${name}=${value}`);
 
-    const group = runAzCommand([
+    const group = await runAzCommand([
       "pipelines",
       "variable-group",
       "create",
@@ -106,7 +109,7 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
     // if ()
     // for (const [name, value] of g.variables) {
     //   if (value instanceof SecretVal)
-    //     runAzCommand([
+    //     await runAzCommand([
     //       "pipelines",
     //       "variable-group",
     //       "variable",
@@ -124,22 +127,20 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
     // }
   }
 
-  for (const v of changes.changedVars) {
-    runAzCommand([
-      "pipelines",
-      "variable-group",
-      "variable",
-      (v.oldValue === undefined) ? "create" : "update",
-      "--only-show-errors",
-      "--id",
-      `${v.groupId}`,
-      "--name",
-      v.varName,
-      "--value",
-      rawValue(v.newValue)!,
-      "--secret",
-      `${v.newValue instanceof SecretVal}`,
-    ]);
-  }
+  await runAzParallel(changes.changedVars.map((v) => [
+    "pipelines",
+    "variable-group",
+    "variable",
+    (v.oldValue === undefined) ? "create" : "update",
+    "--only-show-errors",
+    "--id",
+    `${v.groupId}`,
+    "--name",
+    v.varName,
+    "--value",
+    rawValue(v.newValue)!,
+    "--secret",
+    `${v.newValue instanceof SecretVal}`,
+  ]));
   console.log(chalk.bold`Variable groups updated successfully!`);
 }

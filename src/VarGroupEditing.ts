@@ -69,7 +69,7 @@ function formatGroupName(name: string, alias: string) {
 
 export function printChangeSummary(changes: VarGroupCollectionChanges) {
   if (changes.newGroups.length > 0) {
-    console.log(`Going to ${chalk.bold.cyan("CREATE")} the following variable groups:`);
+    console.log(chalk`Going to {bold.cyan CREATE} the following variable groups:`);
     for (const g of changes.newGroups) {
       console.log(chalk`    ${formatGroupName(g.name, g.alias)}{gray : }{gray.italic ${g.description || ""}}`);
       for (const [varName, value] of g.variables)
@@ -89,12 +89,12 @@ export function printChangeSummary(changes: VarGroupCollectionChanges) {
     }
 
     if (addedVars.length > 0) {
-      console.log(`Going to ${chalk.bold.green("ADD")} the following variables:`);
+      console.log(chalk`Going to {green.bold ADD} the following variables:`);
       console.log(addedVars.join(""));
     }
 
     if (updatedVars.length > 0) {
-      console.log(`Going to ${chalk.bold.green("UPDATE")} the following variables:`);
+      console.log(chalk`Going to {green.bold UPDATE} the following variables:`);
       console.log(updatedVars.join(""));
     }
   }
