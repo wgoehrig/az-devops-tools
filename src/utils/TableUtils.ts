@@ -1,6 +1,6 @@
 import { getBorderCharacters, table } from "table";
 import * as yargs from "yargs";
-import { VarGroupCollection } from "./VarGroupCollection";
+import { VarGroupCollection } from "../vargroups/VarGroupCollection";
 import chalk = require("chalk");
 
 function sum(x: number[]) {

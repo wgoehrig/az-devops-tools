@@ -1,17 +1,18 @@
 import * as fs from "fs";
 import * as path from "path";
-import { promptToConfirm, runAzCommand, runAzParallel } from "./MiscUtils";
-import { printTable } from "./TableUtils";
-import { AzVarGroupJson, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCollection";
-import { findChanges, printChangeSummary } from "./VarGroupEditing";
+import { runAzCommand, runAzParallel } from "./utils/AzUtils";
+import { promptToConfirm, startSpinner } from "./utils/MiscUtils";
+import { printTable } from "./utils/TableUtils";
+import { AzVarGroupJson, rawValue, SecretVal, VarGroupCollection } from "./vargroups/VarGroupCollection";
+import { findChanges, printChangeSummary } from "./vargroups/VarGroupEditing";
 import chalk = require("chalk");
 require("source-map-support").install();
 require('yargonaut')
-.style('green')
-.style('yellow', "required")
-.style('cyan', "Positionals:")
-.helpStyle('cyan')
-.errorsStyle('red.bold');
+  .style('green')
+  .style('yellow', "required")
+  .style('cyan', "Positionals:")
+  .helpStyle('cyan')
+  .errorsStyle('red.bold');
 import yargs = require("yargs");
 import ora = require("ora");
 
@@ -50,7 +51,7 @@ yargs.strict(true)
   .argv;
 
 async function getVarGroups(prefix?: string, outDir?: string, silent = false) {
-  const spinner = ora(chalk`Running {bold az pipelines variable-group list} ...`).start();
+  const spinner = startSpinner(chalk`Running {bold az pipelines variable-group list} ...`);
   const groups: AzVarGroupJson[] = await runAzCommand([
     "pipelines",
     "variable-group",
@@ -99,7 +100,7 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
       "variable-group",
       "create",
       "--only-show-errors",
-      "--variables",  ...variables,
+      "--variables", ...variables,
       "--name",
       g.name,
       ...description,
