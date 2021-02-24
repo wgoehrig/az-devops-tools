@@ -39,8 +39,11 @@ export function findChanges(oldVars: VarGroupCollection, newVars: VarGroupCollec
       const oldValue = oldVars.getValue(groupAlias, varName);
       const newValue = newVars.getValue(groupAlias, varName);
 
+      let newRaw = rawValue(newValue);
+      if (typeof newRaw === "number") // it's easy to accidentally set a number instead of string in YAML - we can just convert those...
+        newRaw = String(newRaw);
+      
       // Skip anything missing, null, or ""
-      const newRaw = rawValue(newValue);
       if (undefined === newRaw || "" === newRaw || null === newRaw)
         continue;
 

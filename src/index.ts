@@ -85,6 +85,12 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
 
   const changes = findChanges(currentVals, newVals);
   printChangeSummary(changes);
+
+  if (changes.changedVars.length === 0 && changes.newGroups.length === 0) {
+    console.log(chalk.bold`Nothing to change - everything is up to date!`);
+    return;
+  }
+
   await promptToConfirm();
 
   // az pipelines variable - group variable update--id 899 --name BILLTEST--value foo--secret false --only - show - errors - o none
