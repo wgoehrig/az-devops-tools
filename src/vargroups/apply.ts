@@ -5,15 +5,15 @@ import { promptToConfirm } from "../utils/MiscUtils";
 import { isDeleted, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCollection";
 import { findChanges, printChangeSummary } from "./VarGroupEditing";
 import chalk = require("chalk");
+import { Argv } from "yargs";
 
 export const command = "apply <yaml>"
 export const desc = "Update a set of variable groups";
-export const builder = {
-  yaml: {
+export const builder = (yargs: Argv) =>
+  yargs.positional("yaml", {
     describe: "Path of updated YAML file.",
     type: "string"
-  }
-} as const;
+  });
 export function handler(argv: any) { updateVarGroups(argv.yaml); }
 
 async function updateVarGroups(yamlFile: string) {
@@ -94,8 +94,8 @@ async function updateVarGroups(yamlFile: string) {
         ...commonOptions,
         "--yes"
       ];
-    } 
-    
+    }
+
     return [
       "pipelines",
       "variable-group",
