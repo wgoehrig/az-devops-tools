@@ -166,7 +166,8 @@ export class VarGroupCollection {
   public toString() {
     let formattedStr = YAML.stringify({ groups: this.groups }, { customTags: [secretYamlTag] });
     formattedStr += "\n# Variables values are defined in below.  If a property is common to **all** groups, a single string value may be used.  Otherwise, a value should be provided for each group defined above.";
-    formattedStr += "\n# Also, note that any \"\", null, or missing values will **not** be updated/deleted.  To clear a property value, you can use the web UI.  Secret begin with the !secret tag.\n";
+    formattedStr += "\n# Also, note that any \"\", null, or missing values will **not** be updated/deleted.";
+    formattedStr += "\n# To actually delete a variable, use the !delete tag.  Secrets begin with the !secret tag.\n";
     formattedStr += YAML.stringify({ variables: this.variables }, { customTags: [secretYamlTag] });
 
     return formattedStr;
