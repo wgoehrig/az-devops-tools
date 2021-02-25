@@ -3,7 +3,7 @@ import * as path from "path";
 import { runAzCommand, runAzParallel } from "./utils/AzUtils";
 import { promptToConfirm, startSpinner } from "./utils/MiscUtils";
 import { printTable } from "./utils/TableUtils";
-import { AzVarGroupJson, rawValue, SecretVal, VarGroupCollection } from "./vargroups/VarGroupCollection";
+import { AzVarGroupJson, isDeleted, rawValue, SecretVal, VarGroupCollection } from "./vargroups/VarGroupCollection";
 import { findChanges, printChangeSummary } from "./vargroups/VarGroupEditing";
 import chalk = require("chalk");
 require("source-map-support").install();
@@ -98,8 +98,8 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
   for (const g of changes.newGroups) {
     const description = (g.description === undefined || g.description === null) ? [] : ["--description", g.description];
     const variables = g.variables
-      .filter(([_n, value]) => !(value instanceof SecretVal))
-      .map(([name, value]) => `${name}=${value}`);
+      .filter(([_n, value]) => !(value instanceof SecretVal || isDeleted(value) || value === undefined))
+      .map(([name, value]) => `${name}=${JSON.stringify(value)}`);
 
     const group = await runAzCommand([
       "pipelines",
@@ -108,46 +108,66 @@ async function updateVarGroups(prefix: string, yamlFile: string) {
       "--only-show-errors",
       "--variables", ...variables,
       "--name",
-      g.name,
+      JSON.stringify(g.name),
       ...description,
     ]);
 
-    // // TODO...
-    // if ()
-    // for (const [name, value] of g.variables) {
-    //   if (value instanceof SecretVal)
-    //     await runAzCommand([
-    //       "pipelines",
-    //       "variable-group",
-    //       "variable",
-    //       "create",
-    //       "--only-show-errors",
-    //       "--id",
-    //       `${v.groupId}`,
-    //       "--name",
-    //       v.varName,
-    //       "--value",
-    //       rawValue(v.newValue)!,
-    //       "--secret",
-    //       "true",
-    //     ]);
-    // }
+    const azCommands: string[][] = [];
+    for (const [name, value] of g.variables) {
+      const raw = rawValue(value);
+      if (value instanceof SecretVal && raw !== null && !isDeleted(raw))
+        azCommands.push([
+          "pipelines",
+          "variable-group",
+          "variable",
+          "create",
+          "--only-show-errors",
+          "--id",
+          `${group.id}`,
+          "--name",
+          name,
+          "--value",
+          raw,
+          "--secret",
+          "true",
+        ]);
+    }
+    await runAzParallel(azCommands);
   }
 
-  await runAzParallel(changes.changedVars.map((v) => [
-    "pipelines",
-    "variable-group",
-    "variable",
-    (v.oldValue === undefined) ? "create" : "update",
-    "--only-show-errors",
-    "--id",
-    `${v.groupId}`,
-    "--name",
-    v.varName,
-    "--value",
-    rawValue(v.newValue)!,
-    "--secret",
-    `${v.newValue instanceof SecretVal}`,
-  ]));
+  await runAzParallel(changes.changedVars.map((v) => {
+    const commonOptions = [
+      "--only-show-errors",
+      "--id",
+      `${v.groupId}`,
+      "--name",
+      v.varName,
+    ];
+
+    const newVal = rawValue(v.newValue);
+    if (isDeleted(newVal)) {
+      return [
+        "pipelines",
+        "variable-group",
+        "variable",
+        "delete",
+        ...commonOptions,
+        "--yes"
+      ];
+    } 
+    
+    return [
+      "pipelines",
+      "variable-group",
+      "variable",
+      (v.oldValue === undefined) ? "create" : "update",
+      ...commonOptions,
+      "--value",
+      newVal!,
+      "--secret",
+      `${v.newValue instanceof SecretVal}`,
+    ];
+  }), true);
+
   console.log(chalk.bold`Variable groups updated successfully!`);
 }

@@ -1,6 +1,6 @@
 import chalk = require("chalk");
 import util = require("util");
-import { AzVarGroupJson, displayValue, rawValue, ValueType, VarGroupCollection } from "./VarGroupCollection";
+import { AzVarGroupJson, displayValue, isDeleted, rawValue, ValueType, VarGroupCollection } from "./VarGroupCollection";
 
 export function findChanges(oldVars: VarGroupCollection, newVars: VarGroupCollection): VarGroupCollectionChanges {
   const groupAliases = new Set(newVars.aliases);
@@ -15,11 +15,18 @@ export function findChanges(oldVars: VarGroupCollection, newVars: VarGroupCollec
     const oldGroup = oldVars.groups[alias];
 
     if (oldGroup === undefined) {
+      const variables = newVars.varNames
+        .map((n): [string, ValueType] => [n, newVars.getValue(alias, n)])
+        .filter(([_n, val]) => {
+          const raw = rawValue(val);
+          return !(undefined === raw || "" === raw || null === raw || isDeleted(raw));
+        });
+
       changes.newGroups.push({
         alias,
         name: newGroup.name,
         description: newGroup.description,
-        variables: newVars.varNames.map((n) => [n, newVars.getValue(alias, n)]),
+        variables,
       });
       groupAliases.delete(alias);
       continue;
@@ -28,7 +35,7 @@ export function findChanges(oldVars: VarGroupCollection, newVars: VarGroupCollec
     if (newGroup.name !== oldGroup.name || newGroup.id !== oldGroup.id) {
       console.error("ERROR: group defined in YAML does not match group in Azure DevOps");
       console.error(`Expected: \n${util.inspect(oldGroup, false, 3, true)}\n\nBut got: ${util.inspect(newGroup, false, 3, true)}`);
-      throw new Error("Invalid YAML");
+      process.exit(1);
     }
   }
 
@@ -45,6 +52,9 @@ export function findChanges(oldVars: VarGroupCollection, newVars: VarGroupCollec
       
       // Skip anything missing, null, or ""
       if (undefined === newRaw || "" === newRaw || null === newRaw)
+        continue;
+
+      if (isDeleted(newRaw) && undefined === oldValue)
         continue;
 
       if (newRaw === rawValue(oldValue))
@@ -84,11 +94,14 @@ export function printChangeSummary(changes: VarGroupCollectionChanges) {
   if (changes.changedVars.length > 0) {
     const addedVars: string[] = [];
     const updatedVars: string[] = [];
+    const deletedVars: string[] = [];
     for (const v of changes.changedVars) {
       if (v.oldValue === undefined)
         addedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{green.bold ${displayValue(v.newValue)}}\n`)
-      else
+      else if (!isDeleted(v.newValue))
         updatedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{red ${displayValue(v.oldValue)}} {gray ==> } {green.bold ${displayValue(v.newValue)}}\n`);
+      else
+        deletedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{red.strikethrough ${displayValue(v.oldValue)}}\n`)
     }
 
     if (addedVars.length > 0) {
@@ -99,6 +112,11 @@ export function printChangeSummary(changes: VarGroupCollectionChanges) {
     if (updatedVars.length > 0) {
       console.log(chalk`Going to {green.bold UPDATE} the following variables:`);
       console.log(updatedVars.join(""));
+    }
+
+    if (deletedVars.length > 0) {
+      console.log(chalk`Going to {red.bold DELETE} the following variables:`);
+      console.log(deletedVars.join(""));
     }
   }
 }

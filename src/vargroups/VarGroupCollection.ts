@@ -2,7 +2,12 @@
 import chalk = require("chalk");
 import * as YAML from "yaml";
 
-export type ValueType = string | null | SecretVal;
+export const deleted = Symbol();
+export function isDeleted(v: ValueType): v is typeof deleted {
+  return (v === deleted);
+}
+
+export type ValueType = string | null | SecretVal | typeof deleted;
 interface ExpandedVar {
   [alias: string]: ValueType;
 }
@@ -14,14 +19,15 @@ export class SecretVal {
   constructor(public value: string | null) { }
   public toString() { return this.value; }
 }
-export function rawValue(v: ValueType): string | null {
+
+export function rawValue(v: ValueType): string | null | typeof deleted {
   return (v instanceof SecretVal) ? v.value : v;
 }
 
 export function displayValue(v: ValueType): string {
   if (v instanceof SecretVal)
     return chalk.yellow("*****");
-  if (v === undefined)
+  if (v === undefined || isDeleted(v))
     return chalk.bgRed("     ");
   if (v === "")
     return chalk.bgRedBright.black(` "" `);
@@ -37,6 +43,12 @@ const secretYamlTag = {
   resolve(_doc: any, cst: any) {
     return new SecretVal(cst.strValue === "null" ? null : cst.strValue);
   },
+};
+
+const deleteYamlTag = {
+  identify: (value: any) => value === deleted,
+  tag: "!delete",
+  resolve(_doc: any, _cst: any) { return deleted },
 };
 
 export interface VarGroupYaml {
@@ -162,7 +174,7 @@ export class VarGroupCollection {
 
   public static fromYaml(str: string) {
     const collection = new VarGroupCollection();
-    collection._yaml = YAML.parse(str, { customTags: [secretYamlTag] });
+    collection._yaml = YAML.parse(str, { customTags: [secretYamlTag, deleteYamlTag] });
     return collection;
   }
 }
