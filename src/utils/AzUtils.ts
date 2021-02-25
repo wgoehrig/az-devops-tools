@@ -1,6 +1,9 @@
 import chalk = require("chalk");
 import * as child_process from "child_process";
+import * as ini from "ini";
 import * as os from "os";
+import * as path from "path";
+import * as fs from "fs";
 import * as util from "util";
 import * as which from "which";
 import * as workerFarm from "worker-farm";
@@ -83,4 +86,33 @@ export async function runAzCommand(args: string[], options: Partial<AzOptions>={
 
 export async function runAzInWorker(args: string[], options: Partial<AzOptions>={}, callback: (v: any) => void): Promise<any> {
   callback(await _runAz(args, options));
+}
+
+let azConfig: [org: string, project: string];
+export function getAzConfig() {
+  if (!azConfig) {
+    const configPath = path.join(os.homedir(), ".azure/azuredevops/config");
+    if (!fs.existsSync(configPath)) {
+      console.log(chalk.red`You are missing the azure-devops az extension!`);
+      console.log(chalk.red`Try running: {bold az extension add --name azure-devops}`);
+      process.exit(1);
+    }
+    
+    let config: any;
+    try {
+      config = ini.parse(fs.readFileSync(configPath).toString());
+    } catch {}
+    
+    if (!config?.defaults?.organization || !config?.defaults?.project) {
+      console.log(chalk.red`Your devops organization/project is not configured!`);
+      console.log(chalk.red`Try running: {bold az devops configure --defaults organization=... project=... }`);
+      process.exit(1);
+    }
+    azConfig = [config?.defaults?.organization, config?.defaults?.project];
+  }
+  return azConfig;
+}
+
+export function checkAz(): void {
+  getAzConfig();
 }

@@ -1,6 +1,7 @@
 
 import chalk = require("chalk");
 import * as YAML from "yaml";
+import { getAzConfig } from "../utils/AzUtils";
 
 export const deleted = Symbol();
 export function isDeleted(v: ValueType): v is typeof deleted {
@@ -92,6 +93,7 @@ export class VarGroupCollection {
   }
 
   public addGroups(prefix: string, groups: AzVarGroupJson[]) {
+    const [organization, project] = getAzConfig();
     for (const g of groups) {
       const alias = g.name.replace(prefix, "").replace(/^[^\da-z]*/i, "");
       if (alias in this.groups)
@@ -101,7 +103,7 @@ export class VarGroupCollection {
         id: g.id,
         name: g.name,
         description: g.description,
-        url: encodeURI(`https://dev.azure.com/bentleycs/iModelTechnologies/_library?itemType=VariableGroups&view=VariableGroupView&variableGroupId=${g.id}&path=${g.name}`),
+        url: encodeURI(`${organization}/${project}/_library?itemType=VariableGroups&view=VariableGroupView&variableGroupId=${g.id}&path=${g.name}`),
       };
 
       const missingVars = new Set(this.varNames);

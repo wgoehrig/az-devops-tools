@@ -6,8 +6,12 @@ require('yargonaut')
   .helpStyle('cyan')
   .errorsStyle('red.bold');
 import yargs = require("yargs");
+import { checkAz } from "./utils/AzUtils";
 
-(async () => {  
+(async () => {
+  // Check that az is configured correctly before proceeding - it's a dependency!
+  await checkAz();
+  
   yargs.strict(true)
     .wrap(Math.min(150, yargs.terminalWidth()))
     .version("2.0.0")
