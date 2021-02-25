@@ -6,24 +6,25 @@ import { isDeleted, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCo
 import { findChanges, printChangeSummary } from "./VarGroupEditing";
 import chalk = require("chalk");
 
-export const command = "apply <prefix> <yaml>"
+export const command = "apply <yaml>"
 export const desc = "Update a set of variable groups";
 export const builder = {
-  prefix: {
-    describe: "Common prefix for a set of variable groups",
-    type: "string"
-  },
   yaml: {
     describe: "Path of updated YAML file.",
     type: "string"
   }
 } as const;
-export function handler(argv: any) { updateVarGroups(argv.prefix, argv.yaml); }
+export function handler(argv: any) { updateVarGroups(argv.yaml); }
 
-async function updateVarGroups(prefix: string, yamlFile: string) {
-  const currentVals = await getVarGroups(prefix, undefined, true);
+async function updateVarGroups(yamlFile: string) {
   const newVals = VarGroupCollection.fromYaml(fs.readFileSync(yamlFile).toString());
+  const prefix = newVals.prefix;
+  if (!prefix) {
+    console.log(chalk.bold`Nothing to change - yaml file does not contain any variable groups.`);
+    return;
+  }
 
+  const currentVals = await getVarGroups(prefix, undefined, true);
   const changes = findChanges(currentVals, newVals);
   printChangeSummary(changes);
 

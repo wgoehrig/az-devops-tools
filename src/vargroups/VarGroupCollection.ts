@@ -53,6 +53,7 @@ const deleteYamlTag = {
 };
 
 export interface VarGroupYaml {
+  prefix?: string;
   groups: {
     [alias: string]: {
       name: string;
@@ -82,6 +83,7 @@ export class VarGroupCollection {
   private _yaml: VarGroupYaml;
   public get aliases(): string[] { return Object.keys(this._yaml.groups); }
   public get varNames(): string[] { return Object.keys(this._yaml.variables); }
+  public get prefix() { return this._yaml.prefix; }
   public get groups() { return this._yaml.groups; }
   public get variables() { return this._yaml.variables; }
 
@@ -93,6 +95,10 @@ export class VarGroupCollection {
   }
 
   public addGroups(prefix: string, groups: AzVarGroupJson[]) {
+    if (this.prefix && this.prefix !== prefix)
+      throw new Error(`Cannot combine multiple prefixes!`);
+    this._yaml.prefix = prefix;
+    
     const [organization, project] = getAzConfig();
     for (const g of groups) {
       const alias = g.name.replace(prefix, "").replace(/^[^\da-z]*/i, "");
@@ -166,7 +172,7 @@ export class VarGroupCollection {
   }
 
   public toString() {
-    let formattedStr = YAML.stringify({ groups: this.groups }, { customTags: [secretYamlTag] });
+    let formattedStr = YAML.stringify({ prefix: this.prefix, groups: this.groups }, { customTags: [secretYamlTag] });
     formattedStr += "\n# Variables values are defined in below.  If a property is common to **all** groups, a single string value may be used.  Otherwise, a value should be provided for each group defined above.";
     formattedStr += "\n# Also, note that any \"\", null, or missing values will **not** be updated/deleted.";
     formattedStr += "\n# To actually delete a variable, use the !delete tag.  Secrets begin with the !secret tag.\n";
