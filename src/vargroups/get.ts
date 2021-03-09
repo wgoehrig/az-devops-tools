@@ -31,7 +31,7 @@ export async function getVarGroups(prefix?: string, outDir?: string, silent = fa
     "list",
     "--only-show-errors",
     "--query",
-    `"sort_by([?contains(@.name, '${prefix}')],&name)"`,
+    `sort_by([?contains(@.name, '${prefix}')],&name)`,
   ]);
   spinner.stop();
 

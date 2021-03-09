@@ -8,6 +8,7 @@ import * as util from "util";
 import * as which from "which";
 import * as workerFarm from "worker-farm";
 import { startSpinner } from "./MiscUtils";
+const { quoteForShell } = require("puka");
 const execFile = util.promisify(child_process.execFile);
 
 interface AzOptions {
@@ -39,8 +40,8 @@ export async function runAzParallel(argSets: string[][], options: Partial<AzOpti
     spinner.stop();
   } catch (error) {
     spinner.stop();
-    console.error(error.message);
     await new Promise((resolve) => workerFarm.end(workers, resolve));
+    console.error(error.message);
     process.exit(1);
   }
   workerFarm.end(workers);
@@ -59,7 +60,7 @@ async function _runAz(args: string[], options: Partial<AzOptions>={}): Promise<a
   const execOptions = { windowsVerbatimArguments: true, shell: true } as child_process.ExecFileOptions;
   let azResult: { stdout: string, stderr: string};
   try {
-    azResult = await execFile(`"${azPath}"`, args, execOptions);
+    azResult = await execFile(`"${azPath}"`, args.map((v) => quoteForShell(v)), execOptions);
   } catch (error) {
     return error;
   }

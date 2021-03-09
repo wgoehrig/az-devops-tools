@@ -55,7 +55,7 @@ async function addVarGroupPermissions(prefix: string, email: string, admin: bool
     "--subject",
     email,
     "--query",
-    `"[?(${groupFilters.join("||")})].{token:token,allow:acesDictionary.*.allow,effective:acesDictionary.*.*.effectiveAllow[]}"`,
+    `[?(${groupFilters.join("||")})].{token:token,allow:acesDictionary.*.allow,effective:acesDictionary.*.*.effectiveAllow[]}`,
   ]);
   spinner.stop();
 
