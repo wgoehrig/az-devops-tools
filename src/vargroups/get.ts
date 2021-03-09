@@ -18,7 +18,7 @@ export const builder = (yargs: Argv) => yargs
     outDir: {
       alias: "o",
       describe: "Where to save YAML output.",
-      type: "boolean"
+      type: "string"
     }
   });
 export function handler(argv: any) { getVarGroups(argv.prefix, argv.outDir); }
@@ -46,7 +46,7 @@ export async function getVarGroups(prefix?: string, outDir?: string, silent = fa
     const filename = path.join(path.resolve(process.cwd(), outDir), `${prefix}.yaml`);
     fs.writeFileSync(filename, yamlStr);
     console.log();
-    console.log(chalk.bold(`YAML file saved to ${chalk.cyan(filename)}`));
+    console.log(chalk.bold`YAML file saved to {cyan ${filename}}`);
   }
 
   return collection;
