@@ -19,6 +19,7 @@ function isExpandedVar(v: ValueType | ExpandedVar): v is ExpandedVar {
 export class SecretVal {
   constructor(public value: string | null) { }
   public toString() { return this.value; }
+  public clone() { return new SecretVal(this.value); }
 }
 
 export function rawValue(v: ValueType): string | null | typeof deleted {
@@ -154,7 +155,7 @@ export class VarGroupCollection {
 
     const expanded: ExpandedVar = {};
     for (const a of this.aliases)
-      expanded[a] = variable;
+      expanded[a] = (variable instanceof SecretVal) ? variable.clone() : variable;
 
     return expanded;
   }
