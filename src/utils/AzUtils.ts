@@ -8,15 +8,20 @@ import * as util from "util";
 import * as which from "which";
 import * as workerFarm from "worker-farm";
 import { startSpinner } from "./MiscUtils";
+import { v4 as uuidv4 } from "uuid";
 const { quoteForShell } = require("puka");
 const execFile = util.promisify(child_process.execFile);
+const writeFile = util.promisify(fs.writeFile);
+const unlink = util.promisify(fs.unlink);
 
 interface AzOptions {
   parseJson: boolean;
+  inFile: boolean; // if true, assumes last arg should be saved to file & replaced w/ path
 }
 
 const defaultAzOptions: AzOptions = {
   parseJson: true,
+  inFile: false,
 }
 
 export async function runAzParallel(argSets: string[][], options: Partial<AzOptions>={}): Promise<any[]> {
@@ -57,22 +62,33 @@ async function _runAz(args: string[], options: Partial<AzOptions>={}): Promise<a
   if (process.platform === "win32")
     process.env.COMSPEC = "cmd.exe";
 
-  const execOptions = { windowsVerbatimArguments: true, shell: true } as child_process.ExecFileOptions;
-  let azResult: { stdout: string, stderr: string};
-  try {
-    azResult = await execFile(`"${azPath}"`, args.map((v) => quoteForShell(v)), execOptions);
-  } catch (error) {
-    return error;
+  if (opts.inFile) {
+    const inFilePath = path.join(os.tmpdir(), `az-devops-tools-${uuidv4()}.tmpinfile.json`);
+    await writeFile(inFilePath, args[args.length-1]);
+    args[args.length-1] = inFilePath;
   }
-  const stderr = azResult.stderr.toString().trim();
-  const azOutput = azResult.stdout.toString();
+
   try {
-    const val = (opts.parseJson) ? JSON.parse(azOutput) : azOutput;
-    if (stderr)
-      console.error(chalk.yellow(stderr))
-    return val;
-  } catch (error) {
-    return new Error(chalk`{yellow ${stderr}}\n{dim ${azOutput}}\n{red ERROR: az did not return valid JSON!}`);
+    const execOptions = { windowsVerbatimArguments: true, shell: true, maxBuffer: 48 * 2048 * 1024 } as child_process.ExecFileOptions;
+    let azResult: { stdout: string, stderr: string};
+    try {
+      azResult = await execFile(`"${azPath}"`, args.map((v) => quoteForShell(v)), execOptions);
+    } catch (error) {
+      return error;
+    }
+    const stderr = azResult.stderr.toString().trim();
+    const azOutput = azResult.stdout.toString();
+    try {
+      const val = (opts.parseJson) ? JSON.parse(azOutput) : azOutput;
+      if (stderr)
+        console.error(chalk.yellow(stderr))
+      return val;
+    } catch (error) {
+      return new Error(chalk`{yellow ${stderr}}\n{dim ${azOutput}}\n{red ERROR: az did not return valid JSON!}`);
+    }
+  } finally {
+    if (opts.inFile)
+      await unlink(args[args.length-1]);
   }
 }
 
