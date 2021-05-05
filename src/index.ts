@@ -18,6 +18,7 @@ import { checkAz } from "./utils/AzUtils";
     .usage("Azure DevOps Tools\n\n Tools to make certain tasks suck less.")
     .command(require("./vargroups/vargoups"))
     .command(require("./svc-conns/svc-conns"))
+    .command(require("./logs/logs"))
     .help()
     .demandCommand(2)
     .argv;
