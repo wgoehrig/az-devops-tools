@@ -102,6 +102,7 @@ export async function runAzCommand(args: string[], options: Partial<AzOptions>={
 }
 
 export async function runAzInWorker(args: string[], options: Partial<AzOptions>={}, callback: (v: any) => void): Promise<any> {
+  azPath = which.sync("az");
   callback(await _runAz(args, options));
 }
 

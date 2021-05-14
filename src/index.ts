@@ -3,12 +3,13 @@ import yargs = require("yargs");
 import { fixYargsColors } from "./utils/YargsColors";
 import { checkAz } from "./utils/AzUtils";
 
-(async () => {
-  // Check that az is configured correctly before proceeding - it's a dependency!
-  await checkAz();
-  
-  fixYargsColors();
-  yargs.strict(true)
+if (require.main === module) {
+  (async () => {
+    // Check that az is configured correctly before proceeding - it's a dependency!
+    await checkAz();
+
+    fixYargsColors();
+    yargs.strict(true)
     .scriptName("az-devops-tools")
     .wrap(Math.min(150, yargs.terminalWidth()))
     .version(require("../package.json").version)
@@ -19,4 +20,7 @@ import { checkAz } from "./utils/AzUtils";
     .help()
     .demandCommand(2)
     .argv;
-})();
+  })();
+}
+
+export { runAzInWorker } from "./utils/AzUtils"
