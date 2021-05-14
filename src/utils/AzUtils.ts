@@ -53,7 +53,7 @@ export async function runAzParallel(argSets: string[][], options: Partial<AzOpti
   return result;
 }
 
-const azPath = which.sync("az");
+let azPath: string;
 async function _runAz(args: string[], options: Partial<AzOptions>={}): Promise<any | Error> {
   const opts: AzOptions = { ...defaultAzOptions, ...options };
 
@@ -108,21 +108,24 @@ export async function runAzInWorker(args: string[], options: Partial<AzOptions>=
 let azConfig: [org: string, project: string];
 export function getAzConfig() {
   if (!azConfig) {
+    const extensionPath = path.join(os.homedir(), ".azure/cliextensions/azure-devops");
     const configPath = path.join(os.homedir(), ".azure/azuredevops/config");
-    if (!fs.existsSync(configPath)) {
-      console.log(chalk.red`You are missing the azure-devops az extension!`);
-      console.log(chalk.red`Try running: {bold az extension add --name azure-devops}`);
+    if (!fs.existsSync(extensionPath)) {
+      console.log(chalk.red`You are missing the {bold azure-devops} az extension!`);
+      console.log(chalk.red`Try running: {bold.yellow az extension add --name azure-devops}`);
       process.exit(1);
     }
     
     let config: any;
-    try {
-      config = ini.parse(fs.readFileSync(configPath).toString());
-    } catch {}
-    
+    if (fs.existsSync(configPath)) {
+      try {
+        config = ini.parse(fs.readFileSync(configPath).toString());
+      } catch {}
+    }
+
     if (!config?.defaults?.organization || !config?.defaults?.project) {
       console.log(chalk.red`Your devops organization/project is not configured!`);
-      console.log(chalk.red`Try running: {bold az devops configure --defaults organization=... project=... }`);
+      console.log(chalk.red`Try running: {bold.yellow az devops configure --defaults organization=... project=... }`);
       process.exit(1);
     }
     azConfig = [config?.defaults?.organization, config?.defaults?.project];
@@ -131,5 +134,13 @@ export function getAzConfig() {
 }
 
 export function checkAz(): void {
+  try {
+    azPath = which.sync("az");
+  } catch (error) {
+    console.log(chalk.red`Error: az-devops-tools requires {bold az}, the Azure CLI.`);
+    console.log(chalk.red`Visit {bold.blue.underline https://aka.ms/installazcli} for installation instructions.`);
+    process.exit(1);
+  }
+
   getAzConfig();
 }
