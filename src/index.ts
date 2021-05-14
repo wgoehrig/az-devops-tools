@@ -9,7 +9,7 @@ import { checkAz } from "./utils/AzUtils";
   
   fixYargsColors();
   yargs.strict(true)
-    .scriptName("azure-devops-tools")
+    .scriptName("az-devops-tools")
     .wrap(Math.min(150, yargs.terminalWidth()))
     .version(require("../package.json").version)
     .usage("Azure DevOps Tools\n\nTools that wrap the az CLI to make certain DevOps tasks a bit less painful.")
