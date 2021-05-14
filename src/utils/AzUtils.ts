@@ -6,7 +6,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as util from "util";
 import * as which from "which";
-import * as workerFarm from "worker-farm";
+import workerFarm from "worker-farm";
 import { startSpinner } from "./MiscUtils";
 import { v4 as uuidv4 } from "uuid";
 const { quoteForShell } = require("puka");

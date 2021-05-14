@@ -2,12 +2,11 @@ import { runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { promptToConfirm, startSpinner } from "../utils/MiscUtils";
 import { getVarGroups } from "./get";
 import chalk = require("chalk");
-import { Argv } from "yargs";
 import { VarGroupCollection } from "./VarGroupCollection";
 
 export const command = "auth <prefix> <email>"
 export const desc = "Grant a user access to a set of variable groups";
-export const builder = (yargs: Argv) => yargs
+export const builder = (yargs: import("yargs").Argv) => yargs
   .positional("prefix", {
     describe: "Common prefix for a set of variable groups.",
     type: "string"
