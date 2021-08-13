@@ -21,7 +21,8 @@
     "jsx": "react",
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "esModuleInterop": true
   },
   "include": [
     "./src/**/*.ts"

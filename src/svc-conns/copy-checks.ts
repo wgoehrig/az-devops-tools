@@ -1,12 +1,11 @@
 import { getAzConfig, runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { promptToConfirm, startSpinner } from "../utils/MiscUtils";
 import chalk = require("chalk");
-import { Argv } from "yargs";
 
 export const command = "copy-checks <source> <partialTarget>"
 export const desc = chalk`Copies all checks from the <source> service connection to all service connections whose names contain <partialTarget>
 Note that {bold this will create duplicate checks} if they already exist in the target service connections!`;
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs
     .positional("source", {
       describe: "Name of an existing service connection to copy checks from.",

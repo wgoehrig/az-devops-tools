@@ -5,11 +5,10 @@ import { promptToConfirm } from "../utils/MiscUtils";
 import { isDeleted, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCollection";
 import { findChanges, printChangeSummary } from "./VarGroupEditing";
 import chalk = require("chalk");
-import { Argv } from "yargs";
 
 export const command = "apply <yaml>"
 export const desc = "Update a set of variable groups";
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("yaml", {
     describe: "Path of updated YAML file.",
     type: "string"

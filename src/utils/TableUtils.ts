@@ -1,5 +1,5 @@
 import { getBorderCharacters, table } from "table";
-import * as yargs from "yargs";
+import yargs = require("yargs");
 import { VarGroupCollection } from "../vargroups/VarGroupCollection";
 import chalk = require("chalk");
 
