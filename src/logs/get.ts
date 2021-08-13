@@ -4,10 +4,11 @@ import util = require("util");
 import chalk = require("chalk");
 import path = require("path");
 import fs = require("fs");
+import { Argv } from "yargs";
 
 export const command = "get <url>"
 export const desc = "Finds and summarizes all failures in a given pipeline run"
-export const builder = (yargs: import("yargs").Argv) =>
+export const builder = (yargs: Argv) =>
   yargs
     .positional("url", {
       describe: "URL of an Azure DevOps pipeline run.",
