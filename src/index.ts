@@ -14,8 +14,9 @@ if (require.main === module) {
     .wrap(Math.min(150, yargs.terminalWidth()))
     .version(require("../package.json").version)
     .usage("Azure DevOps Tools\n\nTools that wrap the az CLI to make certain DevOps tasks a bit less painful.")
-    .command(require("./vargroups/vargroups"))
+    .command(require("./vargroups/vargoups"))
     .command(require("./svc-conns/svc-conns"))
+    .command(require("./svc-hooks/svc-hooks"))
     .command(require("./logs/logs"))
     .help()
     .demandCommand(2)
@@ -23,4 +24,4 @@ if (require.main === module) {
   })();
 }
 
-export { runAzInWorker } from "./utils/AzUtils";
+export { runAzInWorker } from "./utils/AzUtils"
