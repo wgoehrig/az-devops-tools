@@ -16,6 +16,7 @@ if (require.main === module) {
     .usage("Azure DevOps Tools\n\nTools that wrap the az CLI to make certain DevOps tasks a bit less painful.")
     .command(require("./vargroups/vargoups"))
     .command(require("./svc-conns/svc-conns"))
+    .command(require("./svc-hooks/svc-hooks"))
     .command(require("./logs/logs"))
     .help()
     .demandCommand(2)
