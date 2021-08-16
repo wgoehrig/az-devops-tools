@@ -97,11 +97,11 @@ export function printChangeSummary(changes: VarGroupCollectionChanges) {
     const deletedVars: string[] = [];
     for (const v of changes.changedVars) {
       if (v.oldValue === undefined)
-        addedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{green.bold ${displayValue(v.newValue)}}\n`)
+        addedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{green.bold ${displayValue(v.newValue)}}\n`);
       else if (!isDeleted(v.newValue))
         updatedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{red ${displayValue(v.oldValue)}} {gray ==> } {green.bold ${displayValue(v.newValue)}}\n`);
       else
-        deletedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{red.strikethrough ${displayValue(v.oldValue)}}\n`)
+        deletedVars.push(chalk`    ${formatGroupName(v.groupName, v.groupAlias)}{gray /}{cyan.bold ${v.varName}}{gray : }{red.strikethrough ${displayValue(v.oldValue)}}\n`);
     }
 
     if (addedVars.length > 0) {

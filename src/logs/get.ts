@@ -6,8 +6,8 @@ import path = require("path");
 import fs = require("fs");
 import { Argv } from "yargs";
 
-export const command = "get <url>"
-export const desc = "Finds and summarizes all failures in a given pipeline run"
+export const command = "get <url>";
+export const desc = "Finds and summarizes all failures in a given pipeline run";
 export const builder = (yargs: Argv) =>
   yargs
     .positional("url", {
@@ -45,7 +45,7 @@ async function getFailures(url: string) {
 
 async function getTimeline(runId: string): Promise<any[]> {
   const [_org, project] = getAzConfig();
-  const spinner = startSpinner(chalk`Running {bold az devops invoke} ...`)
+  const spinner = startSpinner(chalk`Running {bold az devops invoke} ...`);
   const res = await runAzCommand([
     "devops",
     "invoke",

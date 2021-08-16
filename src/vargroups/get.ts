@@ -6,7 +6,7 @@ import { printTable } from "../utils/TableUtils";
 import { AzVarGroupJson, VarGroupCollection } from "./VarGroupCollection";
 import chalk = require("chalk");
 
-export const command = "get <prefix>"
+export const command = "get <prefix>";
 export const desc = "Get a set of variable groups";
 export const builder = (yargs: import("yargs").Argv) => yargs
   .positional("prefix", {

@@ -32,9 +32,9 @@ export function displayValue(v: ValueType): string {
   if (v === undefined || isDeleted(v))
     return chalk.bgRed("     ");
   if (v === "")
-    return chalk.bgRedBright.black(` "" `);
+    return chalk.bgRedBright.black(" \"\" ");
   if (v === null)
-    return chalk.bgRedBright.black(`null`);
+    return chalk.bgRedBright.black("null");
 
   return v;
 }
@@ -50,7 +50,7 @@ const secretYamlTag = {
 const deleteYamlTag = {
   identify: (value: any) => value === deleted,
   tag: "!delete",
-  resolve(_doc: any, _cst: any) { return deleted },
+  resolve(_doc: any, _cst: any) { return deleted; },
 };
 
 export interface VarGroupYaml {
@@ -97,7 +97,7 @@ export class VarGroupCollection {
 
   public addGroups(prefix: string, groups: AzVarGroupJson[]) {
     if (this.prefix && this.prefix !== prefix)
-      throw new Error(`Cannot combine multiple prefixes!`);
+      throw new Error("Cannot combine multiple prefixes!");
     this._yaml.prefix = prefix;
     
     const [organization, project] = getAzConfig();

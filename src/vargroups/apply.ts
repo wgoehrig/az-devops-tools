@@ -6,7 +6,7 @@ import { isDeleted, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCo
 import { findChanges, printChangeSummary } from "./VarGroupEditing";
 import chalk = require("chalk");
 
-export const command = "apply <yaml>"
+export const command = "apply <yaml>";
 export const desc = "Update a set of variable groups";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("yaml", {

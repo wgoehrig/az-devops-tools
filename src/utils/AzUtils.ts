@@ -22,12 +22,12 @@ interface AzOptions {
 const defaultAzOptions: AzOptions = {
   parseJson: true,
   inFile: false,
-}
+};
 
 export async function runAzParallel(argSets: string[][], options: Partial<AzOptions>={}): Promise<any[]> {
   const spinner = startSpinner(chalk`Running {bold ${argSets.length}} az commands on {bold ${Math.min(os.cpus().length, argSets.length)}} threads`);
   const workers = workerFarm({ maxRetries: 0, }, __filename, ["runAzInWorker"]);
-  let promises: Promise<any>[] = [];
+  const promises: Promise<any>[] = [];
   for (const args of argSets) {
     promises.push(new Promise((resolve, reject) => {
       workers.runAzInWorker(args, options, (retVal: any) => (retVal instanceof Error) ? reject(retVal) : resolve(retVal));
@@ -81,7 +81,7 @@ async function _runAz(args: string[], options: Partial<AzOptions>={}): Promise<a
     try {
       const val = (opts.parseJson) ? JSON.parse(azOutput) : azOutput;
       if (stderr)
-        console.error(chalk.yellow(stderr))
+        console.error(chalk.yellow(stderr));
       return val;
     } catch (error) {
       return new Error(chalk`{yellow ${stderr}}\n{dim ${azOutput}}\n{red ERROR: az did not return valid JSON!}`);
