@@ -24,4 +24,4 @@ if (require.main === module) {
   })();
 }
 
-export { runAzInWorker } from "./utils/AzUtils"
+export { runAzInWorker } from "./utils/AzUtils";

@@ -6,7 +6,7 @@ import { printTable } from "../utils/TableUtils";
 
 import chalk = require("chalk");
 
-export const command = "get <prefix>"
+export const command = "get <prefix>";
 export const desc = "Get a set of service hooks";
 export const builder = (yargs: import("yargs").Argv) => yargs
   .positional("prefix", {
@@ -34,7 +34,7 @@ export async function getServiceHooks(prefix?: string) {
   spinner.stop();
   runAzCommand([
 
-  ])
+  ]);
 
   // const groups: AzVarGroupJson[] = await runAzCommand([
   //   "pipelines",
