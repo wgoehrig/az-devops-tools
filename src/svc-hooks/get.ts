@@ -6,62 +6,54 @@ import { printTable } from "../utils/TableUtils";
 
 import chalk = require("chalk");
 
-export const command = "get <prefix>";
+export const command = "get <sth>";
 export const desc = "Get a set of service hooks";
 export const builder = (yargs: import("yargs").Argv) => yargs
-  .positional("prefix", {
-    describe: "Common prefix for a set of variable groups.",
+  .positional("sth", {
+    describe: "Something to list service hooks of.",
     type: "string"
   });
 export function handler(argv: any) { 
-  // getServiceHooks(argv.prefix); 
-  console.log(argv);
+  getServiceHooks(argv); 
 }
 
-export async function getServiceHooks(prefix?: string) {
-  const spinner = startSpinner(chalk`Running {bold az pipelines variable-group list} ...`);
+export async function getServiceHooks(argv: any) {
+  console.log(argv);
 
+  const spinner = startSpinner(chalk`Running {bold az pipelines variable-group list} ...`); 
+  // https://dev.azure.com/<org>/_apis/hooks/consumers
   const checks = await runAzCommand([
     "devops",
     "invoke",
-    // "--route-parameters", `project=${project}`,
-    "--area", "hooks",
-    "--resource", "subscriptions",
-    "--http-method", "POST",
-    "--api-version", "6.1-preview.1",
-    // "--query-parameters", "$expand=1",
+    "--route-parameters",
+    "hubName=../../hooks/subscriptions",
+    "--area", "distributedtask",
+    "--resource", "hublicense",
+    "--api-version", "6.1-preview",
+    "--http-method", "GET",
     "--only-show-errors",
-    // "--in-file",
-    JSON.stringify(svcConns)
+    "--in-file", JSON.stringify({
+      "contributionIds": [
+        "ms.vss-build-web.run-attempts-data-provider"
+      ],
+      // "dataProviderContext": {
+      //   "properties": {
+      //     "buildId": runId,
+      //     "stageName": id,
+      //     "sourcePage": {
+      //       "routeId": "ms.vss-build-web.ci-results-hub-route",
+      //       "routeValues": {
+      //         "project": project,
+      //       }
+      //     }
+      //   }
+      // }
+    })
   ], { inFile: true });
   spinner.stop();
-  runAzCommand([
 
-  ]);
-
-  // const groups: AzVarGroupJson[] = await runAzCommand([
-  //   "pipelines",
-  //   "variable-group",
-  //   "list",
-  //   "--only-show-errors",
-  //   "--query",
-  //   `sort_by([?contains(@.name, '${prefix}')],&name)`,
-  // ]);
-  spinner.stop();
-
-  const collection = new VarGroupCollection();
-  collection.addGroups(prefix!, groups);
-
-  if (!silent)
-    printTable(collection);
-
-  const yamlStr = collection.toString();
-  if (outDir && !silent) {
-    const filename = path.join(path.resolve(process.cwd(), outDir), `${prefix}.yaml`);
-    fs.writeFileSync(filename, yamlStr);
-    console.log();
-    console.log(chalk.bold`YAML file saved to {cyan ${filename}}`);
-  }
-
-  return collection;
+  // console.log(checks.value);
+  checks.value.map((i: any) => {
+    console.log(chalk `{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} to POST {green ${i.consumerInputs.url}} on event: {cyan ${i.eventDescription}}`);
+  });
 }

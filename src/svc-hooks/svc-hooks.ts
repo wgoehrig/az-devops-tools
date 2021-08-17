@@ -1,4 +1,5 @@
 import * as get from "./get";
+import * as create from "./create";
 import yargs = require("yargs");
 import chalk from "chalk";
 
@@ -7,7 +8,8 @@ export const desc = "Manage collections of related service hooks";
 export function builder(yargs: import("yargs").Argv) {
   return yargs
     .updateStrings({"Commands:": chalk.cyan`Commands:`})
-    .command(get);
+    .command(get)
+    .command(create);
 }
 export function handler(argv: import("yargs").Argv) {
   yargs.showHelp();
