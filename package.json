@@ -7,7 +7,8 @@
   "scripts": {
     "prestart": "node bundle.js",
     "start": "node . logs get https://dev.azure.com/bentleycs/iModelTechnologies/_build/results?buildId=859799",
-    "build": "node bundle.js",
+    "build": "tsc",
+    "watch": "tsc -w",
     "clean": "rimraf lib dist",
     "lint": "eslint -f visualstudio \"**/*.ts\""
   },

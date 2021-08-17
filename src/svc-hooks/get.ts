@@ -13,7 +13,10 @@ export const builder = (yargs: import("yargs").Argv) => yargs
     describe: "Common prefix for a set of variable groups.",
     type: "string"
   });
-export function handler(argv: any) { getServiceHooks(argv.prefix); }
+export function handler(argv: any) { 
+  // getServiceHooks(argv.prefix); 
+  console.log(argv);
+}
 
 export async function getServiceHooks(prefix?: string) {
   const spinner = startSpinner(chalk`Running {bold az pipelines variable-group list} ...`);
