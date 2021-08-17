@@ -6,7 +6,6 @@
   "license": "MIT",
   "scripts": {
     "prestart": "node bundle.js",
-    "start": "node . logs get https://dev.azure.com/bentleycs/iModelTechnologies/_build/results?buildId=859799",
     "build": "tsc",
     "watch": "tsc -w",
     "clean": "rimraf lib dist",

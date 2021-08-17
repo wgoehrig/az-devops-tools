@@ -9,9 +9,9 @@ import chalk = require("chalk");
 export const command = "get";
 export const desc = "Get a set of service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
-  yargs.option("v", {
+  yargs.option("verbose", {
     // Allow the user to specify verbose mode
-    alias: "verbose",
+    alias: "v",
     demandOption: false,
     describe: "Verbose logging",
     type: "boolean",
@@ -49,7 +49,7 @@ export async function getServiceHooks(argv: any) {
   );
   spinner.stop();
 
-  // Print the entire response is verbose mode.
+  // Print the entire response in verbose mode.
   if (argv.verbose == true) {
     console.log(checks.value);
   } else {
