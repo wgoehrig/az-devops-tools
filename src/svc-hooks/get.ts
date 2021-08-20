@@ -24,7 +24,7 @@ export async function getServiceHooks(argv: any) {
   /* GET request to https://dev.azure.com/<org>/_apis/hooks/consumers
   SUPER DUPER HACKY
   */
-  const spinner = startSpinner(chalk`Running {bold az devops invoke} ...`);
+  const spinner = startSpinner(chalk`Requesting all service hooks via {bold az devops invoke} ...`);
   const checks = await runAzCommand(
     [
       "devops",
