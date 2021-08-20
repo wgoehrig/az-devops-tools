@@ -1,14 +1,11 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // https://docs.microsoft.com/en-us/azure/devops/service-hooks/create-subscription?view=azure-devops#create-a-subscription-for-a-org
 
 import * as fs from "fs";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import * as readline from "readline";
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+const prompts = require("prompts");
 
 import chalk = require("chalk");
 
@@ -148,7 +145,6 @@ export async function handler(argv: any) {
   ]);
   spinner.stop();
 
-  console.log(projects);
 
   // Get projectId of desired project
   const desiredProject = projects.value.find(
@@ -158,7 +154,6 @@ export async function handler(argv: any) {
     throw new Error("Could not find project");
   }
   const projectId = desiredProject.id;
-  console.log(argv.project.toLowerCase(), projectId);
 
   // ALREADY DONE: Determine the event ID and settings
 
@@ -183,29 +178,88 @@ export async function handler(argv: any) {
   };
   // TODO: Add more cases for the other event types.
   // Get required inputs for desired event type.
+  let responses: any = {};
+  let questions: any;
   switch (argv.event) {
     case "build.complete":
-      publisherInputs.buildStatus =  1;
-      publisherInputs.definitionName =  1;
       body.publisherId = "tfs";
-      // resource name??
+      // Get definitionName, buildStatus
+      questions = [
+        { type: "text", name: "definitionName", message: "Definition name: " },
+        { type: "text", name: "buildStatus", message: "Build status: " },
+      ];
+      await (async () => {
+        responses = await prompts(questions);
+      })();
+      publisherInputs.definitionName = responses.definitionName;
+      publisherInputs.buildStatus = responses.buildStatus;
       break;
     case "ms.vss-pipelines.stage-state-changed-event":
-      publisherInputs.PipelineId = 1;
-      publisherInputs.runStateId = 1;
       body.publisherId = "pipelines";
+      // Get pipelineId, stageNameId, stageStateId
+      questions = [
+        { type: "text", name: "pipelineId", message: "Pipeline ID: " },
+        { type: "text", name: "stageNameId", message: "Stage name ID: " },
+        { type: "text", name: "stageStateId", message: "Stage state ID: " }
+      ];
+      await (async () => {
+        responses = await prompts(questions);
+      })();
+      publisherInputs.pipelineId = responses.pipelineId;
+      publisherInputs.stageNameId = responses.stageNameId;
+      publisherInputs.stageStateId = responses.stageStateId;
       break;
     case "git.push":
-      publisherInputs.branch =  rl.question("Branch: ", (a) => {rl.close(); return a;});
-      publisherInputs.pushedBy =  1;
-      publisherInputs.repository =  1;
       body.publisherId = "tfs";
+      // Get branch, pushedBy, and responsitory
+      questions = [
+        { type: "text", name: "repository", message: "Repository: " },
+        { type: "text", name: "branch", message: "Branch: " },
+      ];
+      await (async () => {
+        responses = await prompts(questions);
+      })();
+      publisherInputs.repository = responses.repository;
+      publisherInputs.branch = responses.branch;
       break;
   }
   body.publisherInputs = publisherInputs;
 
-  console.log(argv);
-  console.log(body);
+  // Save request body JSON to file, then pass file path to az devops invoke
+  fs.writeFile("tmp.json", JSON.stringify(body), (err) => {
+    if (err) {
+      throw err;
+    }
+  });
+
+  const spinner2 = startSpinner(
+    chalk`Requesting all service hooks via {bold az devops invoke} ...`
+  );
+  // const response = await runAzCommand(
+  //   [
+  //     "devops",
+  //     "invoke",
+  //     "--route-parameters",
+  //     "hubName=../../hooks/subscriptions",
+  //     "--area",
+  //     "distributedtask",
+  //     "--resource",
+  //     "hublicense",
+  //     "--api-version",
+  //     "6.1-preview",
+  //     "--http-method",
+  //     "POST",
+  //     "--only-show-errors",
+  //     "--in-file",
+  //     "tmp.json",
+  //     JSON.stringify({
+  //       contributionIds: ["ms.vss-build-web.run-attempts-data-provider"],
+  //     }),
+  //   ],
+  //   { inFile: true }
+  // );
+  spinner2.stop();
+
 }
 
 export async function createServiceHook() {
