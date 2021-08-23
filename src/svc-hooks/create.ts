@@ -145,45 +145,41 @@ export async function handler(argv: any) {
   ]);
   spinner.stop();
 
-
   // Get projectId of desired project
   const desiredProject = projects.value.find(
     (e: any) => e.name.toLowerCase() === argv.project.toLowerCase()
   );
   if (desiredProject === undefined) {
-    throw new Error("Could not find project");
+    throw new Error("Could not resolve project id");
   }
   const projectId = desiredProject.id;
 
-  // ALREADY DONE: Determine the event ID and settings
-
+  // Determine the event ID and settings
   // Determine consumer and action IDs and settings
-
-  // Create the webhook
-  // Prepare contents of the request.
-
-  // Fill in required fields depending on our event type.
+  //        Prepare contents of the request.
+  //        Fill in required fields depending on our event type.
   // https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops#build.complete
-  const publisherInputs: any = {};
+  const publisherInputs: any = {projectId: projectId};
   const body = {
-    publisherId: "",
-    eventType: argv.event,
-    resourceVersion: "1.0",
-    consumerId: "webHooks",
     consumerActionId: "httpRequest",
-    publisherInputs: {},
+    consumerId: "webHooks",
     consumerInputs: {
       url: argv.url,
     },
+    eventType: argv.event,
+    publisherId: "",
+    publisherInputs: {},
+    resourceVersion: "1.0",
+    scope: 1,
   };
   // TODO: Add more cases for the other event types.
   // Get required inputs for desired event type.
   let responses: any = {};
   let questions: any;
   switch (argv.event) {
+    // On build complete: get definitionName, buildStatus
     case "build.complete":
       body.publisherId = "tfs";
-      // Get definitionName, buildStatus
       questions = [
         { type: "text", name: "definitionName", message: "Definition name: " },
         { type: "text", name: "buildStatus", message: "Build status: " },
@@ -194,13 +190,13 @@ export async function handler(argv: any) {
       publisherInputs.definitionName = responses.definitionName;
       publisherInputs.buildStatus = responses.buildStatus;
       break;
+    // On Pipeline state changed: get pipelineId, stageNameId, stageStateId
     case "ms.vss-pipelines.stage-state-changed-event":
       body.publisherId = "pipelines";
-      // Get pipelineId, stageNameId, stageStateId
       questions = [
         { type: "text", name: "pipelineId", message: "Pipeline ID: " },
         { type: "text", name: "stageNameId", message: "Stage name ID: " },
-        { type: "text", name: "stageStateId", message: "Stage state ID: " }
+        { type: "text", name: "stageStateId", message: "Stage state ID: " },
       ];
       await (async () => {
         responses = await prompts(questions);
@@ -209,9 +205,9 @@ export async function handler(argv: any) {
       publisherInputs.stageNameId = responses.stageNameId;
       publisherInputs.stageStateId = responses.stageStateId;
       break;
+    // On git push: get branch, pushedBy, and responsitory
     case "git.push":
       body.publisherId = "tfs";
-      // Get branch, pushedBy, and responsitory
       questions = [
         { type: "text", name: "repository", message: "Repository: " },
         { type: "text", name: "branch", message: "Branch: " },
@@ -219,8 +215,22 @@ export async function handler(argv: any) {
       await (async () => {
         responses = await prompts(questions);
       })();
-      publisherInputs.repository = responses.repository;
+      // Find the repo's id.
+      const spinner2 = startSpinner(
+        chalk`Finding your repo via {bold az repos list} ...`
+      );
+      const repos = await runAzCommand(["repos", "list"]);
+      spinner2.stop();
+      const desiredRepo = repos.find(
+        (e: any) => e.name.toLowerCase() === responses.repository.toLowerCase()
+      );
+      if (desiredRepo === undefined) {
+        throw new Error("Could not resolve repo id");
+      }
+      const repoId = desiredRepo.id;
+      publisherInputs.repository = repoId;
       publisherInputs.branch = responses.branch;
+      publisherInputs.pushedBy = ""; // Not implementing hooks for specific users yet.
       break;
   }
   body.publisherInputs = publisherInputs;
@@ -232,36 +242,68 @@ export async function handler(argv: any) {
     }
   });
 
-  const spinner2 = startSpinner(
-    chalk`Requesting all service hooks via {bold az devops invoke} ...`
-  );
-  // const response = await runAzCommand(
-  //   [
-  //     "devops",
-  //     "invoke",
-  //     "--route-parameters",
-  //     "hubName=../../hooks/subscriptions",
-  //     "--area",
-  //     "distributedtask",
-  //     "--resource",
-  //     "hublicense",
-  //     "--api-version",
-  //     "6.1-preview",
-  //     "--http-method",
-  //     "POST",
-  //     "--only-show-errors",
-  //     "--in-file",
-  //     "tmp.json",
-  //     JSON.stringify({
-  //       contributionIds: ["ms.vss-build-web.run-attempts-data-provider"],
-  //     }),
-  //   ],
-  //   { inFile: true }
-  // );
-  spinner2.stop();
-
+  createServiceHook(body);
 }
 
-export async function createServiceHook() {
-  console.log("TO BE IMPLEMENTED");
+export async function createServiceHook(body: any) {
+  // SEND IT
+
+  const spinner2 = startSpinner(
+    chalk`Creating service hook via {bold az devops invoke} ...`
+  );
+  const response = await runAzCommand(
+    [
+      "devops",
+      "invoke",
+      "--route-parameters",
+      "hubName=../../hooks/subscriptions",
+      "--area",
+      "distributedtask",
+      "--resource",
+      "hublicense",
+      "--api-version",
+      "6.1-preview",
+      "--http-method",
+      "POST",
+      "--only-show-errors",
+      "--in-file",
+      JSON.stringify(body),
+    ],
+    { inFile: true }
+  );
+  console.log(response);
+  spinner2.stop();
+
+  //               ..,,:::;;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii;::1ffLLLLLLLLLLL
+  //              ..,,::;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii;::::iiiiiiii;ii11ttttttttt
+  //           .,,,:;;;;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii:. ,:;iiiiiiiiiiiii;;;;;;;;;;
+  //         .,..,:;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii:. ,t1iiiiiiiiiiiiiiiiiiiiiiiii
+  //            :iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii;,  ;C00L1iiiiiiiiiiiiiiiiiiiiiii
+  //           :iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii;,  :tG0000Gfiiiiiiiiiiiiiiiiiiiiii
+  // ::::::,,..;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii:. ,tG00000000Liiiiiiiiiiiiiiiiiiiii
+  // ;;;;iiii::iiiiiiiiiiiiiiiiiiiii;iiiiiiiiii;.  ;C00000000000C1iiiiiiiiiiiiiiiiiii
+  // 11i;::;i;;iiiiiiiiiiiiiiii;;;iiii;iiiiii;,  :f0Ct11fC0000000G1;iiiiiiii;;;;i:;ii
+  // 11111i;:;iiiiiiiiiiiiiiiiiiiiiiii:;iii;,  ,tG00i,. .,iL000000L,:iii;;;;itLCf:ii;
+  // 1111111i:;iiiiiiiiiiiiiiiiiiii;;iii;:,..,:t0000t,    .:L0000C;,,;;;ifCG88@@L:;;:
+  // 11111111i;iiiiiiiiiiiiiiiiiiiiiii;;;:::;ii;f000Gt:.. .:f000L;,::;tG8@@@@88Gt:;;i
+  // 11111111i;iiiiiiiiiiiiiiiiiiiiiii,.:,::;;ii;f0000Cft1tLG0Gf::,,iC8@@8@80CC0C;iii
+  // 11111111;;iiiiiiiiiiiiiiiiiiii;,.  :;;:;:;ii;1C00000000GLi::,iC8@88@80CG8@@81;;i
+  // 1111iii;;iiiiiiiiiiiiiiiiiii;,  ..:iiii;:;iii;itCGGGCLti;:::f8@888@8CC8@@@@@8L1i
+  // 1111;;;;;;;;iiiiiiiiiiiiii;.  .iLCt;;ii;;iiiiii;;i;:::,:::;L8@888@0L0@@@@@@@@8Gf
+  // 1111111i;;:;iiiiiiiiiiii;,  .1C0000Gt;;iiiiiiiiiii;:;;;;;;G@8888@GC8@@@@@@@8GG08
+  // 111111i;;;;:iiiiiiiiiii:.  :LGLLLCG00C1;;iiiiiiiiiiiiii;iG@888@@CC@@@@@@@0CG8@@@
+  // i1111111111;;iiiiiiiii:  .1GL;,..,iL000Li;iiiiiiiiiiii;i0@888@@0C@@@@@@8CC8@@@@@
+  // .,;i11111111;;iiiiiii:  ;L001,    .:f000Gi:iiiiiiiii;;;C@8888@@@@@@@@8GC8@@@@@@@
+  //    .,:;iiiii;:;iiiii:  iGG00L:.    .;G000L,;iiii;::::::C8@@8@@@@@@@@0C0@@@@@@@@@
+  //         ..... .:iiii: .tGGG00L1;,..,iGGGGf.:;iii;,..,. .:f88@@@@@@@CC8@@@@@@@@@@
+  //                 :iii;.:;tGGGG00GCLffCGGGL:,:iiii;..f0i    L@@@@@@@@8@@@@@88@@@@@
+  //                  ,:ii;ii;1LGGGGG00GGGGGf;::;ii;;, ;8t.    f@@@@@@@@@@@@@@@8@@@@@
+  //                    ,;iiiii;1LGGGGGGGGLi,:;:;i1tfi .:      C@@@@@@@@@8GLC8@@@@@@@
+  //                     .:iiiii;i1fLCCCCt:,:;;:1C08@0i:::::;;i0@@@@@@@0LiiG@@@@@@@@@
+  //                       ,;iiiiii;iii;:,:;;;;t8@@8@@@88888@@@@@8088G1::f8@@@@@@@@@@
+  //                        .:iiiiiiii;;;;iii;f8@@@@@@@@@@@@@@@@@@8Gi,,t08G0@@@@@@@@@
+  //                          ,;iiiiiiiiiiii;i8@80GG@@@@@@@@@@@@@@8t:1G80G88888@@@@@@
+  //                           .:iiiiiiiiiii;180CC0@@@@@@@@@@@@@@@CL08008@@888@@@@@@@
+  //                             :iiiiiiiiii;;CG88@@@@@8GG0@@@@@@@@@@@@@888@@@@@@@@@@
+  //                             ,iiiiiiii;:::0@@8@@8GGG0@@@@@@888@@@@@@@@@@@@@@@@@@@
 }

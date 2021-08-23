@@ -24,6 +24,7 @@
     "worker-farm"
   ],
   "dependencies": {
+    "prompts": "^2.4.1",
     "worker-farm": "^1.7.0"
   },
   "devDependencies": {
