@@ -46,24 +46,24 @@ export const builder = (yargs: import("yargs").Argv) =>
       alias: "u",
       describe: "Basic auth for webhook. Use --user.name and --user.password",
     })
-    // .coerce("user", (user: string[]) => {
-    //   // Check if name and password are provided.
-    //   if (user !== undefined) {
-    //     if (user !== undefined && "name" in user && "password" in user) {
-    //       return user;
-    //     } else {
-    //       throw new Error(
-    //         "Could not read user. Example: --user.name=Batman --user.password=WhereIsShe?"
-    //       );
-    //     }
-    //   } else {
-    //     return;
-    //   }
-    // })
+    .coerce("user", (user: string[]) => {
+      // Check if name and password are provided.
+      if (user !== undefined) {
+        if (user !== undefined && "name" in user && "password" in user) {
+          return user;
+        } else {
+          throw new Error(
+            "Could not read user. Example: --user.name=Batman --user.password=WhereIsShe?"
+          );
+        }
+      } else {
+        return;
+      }
+    })
     .option("headers", {
       alias: "H",
       describe:
-        "HTTP headers to send with the webhook's POST request. Use --headers.<header>",
+        "HTTP headers to send with the webhook's POST request. Use --headers.<key>",
       type: "string",
     })
     .option("file", {
@@ -234,20 +234,10 @@ export async function handler(argv: any) {
       break;
   }
   body.publisherInputs = publisherInputs;
-
-  // Save request body JSON to file, then pass file path to az devops invoke
-  fs.writeFile("tmp.json", JSON.stringify(body), (err) => {
-    if (err) {
-      throw err;
-    }
-  });
-
-  createServiceHook(body);
 }
 
 export async function createServiceHook(body: any) {
   // SEND IT
-
   const spinner2 = startSpinner(
     chalk`Creating service hook via {bold az devops invoke} ...`
   );
@@ -271,7 +261,6 @@ export async function createServiceHook(body: any) {
     ],
     { inFile: true }
   );
-  console.log(response);
   spinner2.stop();
 
   //               ..,,:::;;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii;::1ffLLLLLLLLLLL
