@@ -5,6 +5,7 @@
 import * as fs from "fs";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
+import { validEventTypes } from "./eventTypes";
 const prompts = require("prompts");
 
 import chalk = require("chalk");
@@ -97,30 +98,6 @@ export const builder = (yargs: import("yargs").Argv) =>
       type: "string",
     })
     .check((argv: any) => {
-      const validEventTypes = [
-        "build.complete",
-        "ms.vss-release.release-abandoned-event",
-        "ms.vss-release.release-created-event",
-        "ms.vss-release.deployment-approval-completed-event",
-        "ms.vss-release.deployment-approval-pending-event",
-        "ms.vss-release.deployment-completed-event",
-        "ms.vss-release.deployment-started-event",
-        "ms.vss-pipelines.run-state-changed-event",
-        "ms.vss-pipelines.stage-state-changed-event",
-        "ms.vss-pipelinechecks-events.approval-pending",
-        "ms.vss-pipelinechecks-events.approval-completed",
-        "tfvc.checkin",
-        "git.push",
-        "git.pullrequest.created",
-        "git.pullrequest.merged",
-        "git.pullrequest.updated",
-        "workitem.created",
-        "workitem.deleted",
-        "workitem.restored",
-        "workitem.updated",
-        "workitem.commented",
-        "message.posted",
-      ];
       return validEventTypes.includes(argv.event);
     })
     .conflicts("headers", "file"); // Headers and file are mutually exclusive.
@@ -234,6 +211,9 @@ export async function handler(argv: any) {
       break;
   }
   body.publisherInputs = publisherInputs;
+
+  console.log(body);
+  createServiceHook(body);
 }
 
 export async function createServiceHook(body: any) {

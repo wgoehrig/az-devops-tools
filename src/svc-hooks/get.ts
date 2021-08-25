@@ -1,21 +1,35 @@
 import * as fs from "fs";
-import * as path from "path";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import { printTable } from "../utils/TableUtils";
+import { validEventTypes } from "./eventTypes";
 
+const YAML = require("json2yaml");
 import chalk = require("chalk");
 
 export const command = "get";
 export const desc = "Get a set of service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
-  yargs.option("verbose", {
-    // Allow the user to specify verbose mode
-    alias: "v",
-    demandOption: false,
-    describe: "Verbose logging",
-    type: "boolean",
-  });
+  yargs
+    .option("event", {
+      alias: "e",
+      choices: validEventTypes,
+      demandOption: false,
+      describe: "The type of event to get hooks for",
+    })
+    .option("file", {
+      alias: "F",
+      default: "get.yml",
+      describe: "File to write the output to",
+      type: "string",
+    })
+    .option("verbose", {
+      // Allow the user to specify verbose mode
+      alias: "v",
+      demandOption: false,
+      describe: "Verbose logging",
+      type: "boolean",
+    })
+    .normalize("file");
 export function handler(argv: any) {
   getServiceHooks(argv);
 }
@@ -24,7 +38,9 @@ export async function getServiceHooks(argv: any) {
   /* GET request to https://dev.azure.com/<org>/_apis/hooks/consumers
   SUPER DUPER HACKY
   */
-  const spinner = startSpinner(chalk`Requesting all service hooks via {bold az devops invoke} ...`);
+  const spinner = startSpinner(
+    chalk`Requesting all service hooks via {bold az devops invoke} ...`
+  );
   const checks = await runAzCommand(
     [
       "devops",
@@ -49,16 +65,24 @@ export async function getServiceHooks(argv: any) {
   );
   spinner.stop();
 
+  // Filter by event type, if specified.
+  let filtered = checks.value;
+  if (argv.event) {
+    filtered = checks.value.filter((i: any) => i.eventType === argv.event);
+  }
   // Print the entire response in verbose mode.
   if (argv.verbose == true) {
-    console.log(checks.value);
+    console.log(filtered);
   } else {
-    checks.value.map((i: any) => {
+    filtered.map((i: any) => {
       console.log(
-        chalk`{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} on event {cyan ${i.eventDescription}} to POST {green ${i.consumerInputs.url}}`
+        chalk`{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} on event {cyan ${i.eventDescription} }{magenta > }{cyan ${i.eventType}} to POST {green ${i.consumerInputs.url}}`
       );
     });
   }
 
-  console.log(argv.verbose);
+  // Write the output to a specific file.
+  if (argv.file) {
+    fs.writeFileSync(argv.file, YAML.stringify(filtered));
+  }
 }
