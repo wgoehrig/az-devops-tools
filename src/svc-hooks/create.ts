@@ -23,7 +23,6 @@ export async function handler(argv: any) {
   // Open and read service hook from file
   const file = argv.file;
   const fileType = extname(file);
-  console.log(fileType);
   const fileContents = fs.readFileSync(file, "utf8");
 
   // Parse service hook file contents
@@ -39,7 +38,7 @@ export async function handler(argv: any) {
 
   const azCommands: string[][] = [];
 
-  const spinner2 = startSpinner("Preparing service hooks and looking up any missing required data...");
+  const spinner = startSpinner("Preparing service hooks and looking up any missing required data...");
   // Prepare our az commands.
   await Promise.all(
     hookData.map(async (hook: HookInput) => {
@@ -110,12 +109,10 @@ export async function handler(argv: any) {
       ]);
     })
   );
-  spinner2.stop();
+  spinner.stop();
 
   // Start creating webhooks
-  const spinner = startSpinner(
-    chalk`Creating ${azCommands.length} service hooks...via {bold az devops invoke}`
-  );
+  spinner.text = chalk`Creating ${azCommands.length} service hooks...via {bold az devops invoke}`;
   await runAzParallel(azCommands, { inFile: true });
   spinner.stop();
 }

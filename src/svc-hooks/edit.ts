@@ -36,7 +36,7 @@ export async function handler(argv: any) {
   }
 
 
-  const spinner2 = startSpinner("Preparing service hooks and looking up any missing required data...");
+  const spinner = startSpinner("Preparing service hooks and looking up any missing required data...");
   // Prepare our az commands.
   const azCommands: string[][] = [];
   await Promise.all(
@@ -80,12 +80,10 @@ export async function handler(argv: any) {
       ]);
     })
   );
-  spinner2.stop();
+  spinner.stop();
 
   // Start updating webhooks
-  const spinner = startSpinner(
-    chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`
-  );
+  spinner.text = chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`;
   await runAzParallel(azCommands, { inFile: true });
   spinner.stop();
 }
