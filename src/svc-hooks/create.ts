@@ -50,11 +50,9 @@ export async function handler(argv: any) {
   const azCommands: string[][] = [];
 
   // Check if hook data is missing any data
-  // hookData.map(async (hook: Hook) => {
-  for (let i = 0; i < hookData.length; i++) {
-    const hook: Hook = hookData[i];
+  await Promise.all(hookData.map(async (hook: Hook) => {
     // Check if any keys are undefined | null
-    if (!hook.org || !hook.project || !hook.eventType || !hook.url) {
+    if (!hook) {
       throw new Error(chalk.red("Missing data in file"));
     }
 
@@ -117,15 +115,15 @@ export async function handler(argv: any) {
       JSON.stringify(hookDataFormatted),
     ]);
     console.log("hookDataFormatted", hookDataFormatted);
-  }
+  }));
 
   // Start creating webhooks
+  console.log("azCommands", azCommands);
   const spinner = startSpinner(
     chalk`Creating ${azCommands.length} service hooks...via {bold az devops invoke}`
   );
   await runAzParallel(azCommands, { inFile: true });
   spinner.stop();
-  console.log("azCommands", azCommands);
 }
 
 async function searchRepoId(name: string) {
