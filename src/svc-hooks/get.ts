@@ -26,13 +26,6 @@ export const builder = (yargs: import("yargs").Argv) =>
       type: "string",
       normalize: true,
     })
-    .option("outType", {
-      alias: "t",
-      describe: "The type of output to write",
-      choices: ["yaml", "json"],
-      default: "yaml",
-      type: "string",
-    })
     .option("verbose", {
       // Allow the user to specify verbose mode
       alias: "v",
@@ -70,11 +63,7 @@ export async function handler(argv: any) {
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }
-  if (argv.outType === "yaml") {
-    fs.writeFileSync(fPath, YAML.stringify(filtered));
-  } else {
-    fs.writeFileSync(fPath, JSON.stringify(filtered, null, 2));
-  }
+  fs.writeFileSync(fPath, YAML.stringify(filtered));
 }
 
 export async function getServiceHooks() {

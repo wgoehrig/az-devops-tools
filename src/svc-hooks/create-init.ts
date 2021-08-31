@@ -7,21 +7,13 @@ import * as YAML from "yaml";
 export const command = "create-init";
 export const desc = "Initialize the YAML file for creating service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
-  yargs
-    .option("outDir", {
-      alias: "o",
-      default: ".",
-      describe: "Directory to write output file to",
-      type: "string",
-      normalize: true,
-    })
-    .option("outType", {
-      alias: "t",
-      default: "yaml",
-      describe: "Output file type",
-      type: "string",
-      choices: ["yaml", "json"],
-    });
+  yargs.option("outDir", {
+    alias: "o",
+    default: ".",
+    describe: "Directory to write output file to",
+    type: "string",
+    normalize: true,
+  });
 export function handler(argv: any) {
   // Some dummy data to output for user to fill in.
   const sampleJSON = [
@@ -63,18 +55,11 @@ export function handler(argv: any) {
   ];
 
   // Write sample to output file
-  const fPath = join(
-    argv.outDir,
-    `create.${argv.outType}`
-  );
+  const fPath = join(argv.outDir, `create.${argv.outType}`);
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }
-  
+
   // Format the output data correctly, depending on file type
-  if (argv.outType === "yaml") {
-    fs.writeFileSync(fPath, YAML.stringify(sampleJSON));
-  } else {
-    fs.writeFileSync(fPath, JSON.stringify(sampleJSON, null, 2));
-  }
+  fs.writeFileSync(fPath, YAML.stringify(sampleJSON));
 }

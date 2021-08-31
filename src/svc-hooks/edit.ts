@@ -21,20 +21,10 @@ export const builder = (yargs: import("yargs").Argv) =>
 export async function handler(argv: any) {
   // Open and read service hook from file
   const file = argv.file;
-  const fileType = extname(file);
   const fileContents = fs.readFileSync(file, "utf8");
 
   // Parse service hook file contents
-  let hookData: HookFormattedData[];
-  if (fileType === ".json") {
-    hookData = JSON.parse(fileContents);
-  } else if (fileType === ".yaml") {
-    hookData = YAML.parse(fileContents);
-  } else {
-    console.error(chalk.red("Invalid file type"));
-    throw new Error("Invalid file type");
-  }
-
+  const hookData: HookFormattedData[] = YAML.parse(fileContents);
 
   const spinner = startSpinner("Preparing service hooks and looking up any missing required data...");
   // Prepare our az commands.

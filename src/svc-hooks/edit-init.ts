@@ -22,13 +22,6 @@ export const builder = (yargs: import("yargs").Argv) =>
       describe: "Directory to write output file to",
       type: "string",
       normalize: true,
-    })
-    .option("outType", {
-      alias: "t",
-      default: "yaml",
-      describe: "Output file type",
-      type: "string",
-      choices: ["yaml", "json"],
     });
 export async function handler(argv: any) {
   // Get existing service hooks
@@ -57,16 +50,9 @@ export async function handler(argv: any) {
   });
 
   // Write data to output file
-  const fPath = join(
-    argv.outDir,
-    `edit.${argv.outType}`
-  );
+  const fPath = join(argv.outDir, `edit.${argv.outType}`);
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }
-  if (argv.outType === "yaml") {
-    fs.writeFileSync(fPath, YAML.stringify(hooksFormatted));
-  } else {
-    fs.writeFileSync(fPath, JSON.stringify(hooksFormatted, null, 2));
-  }
+  fs.writeFileSync(fPath, YAML.stringify(hooksFormatted));
 }
