@@ -2,7 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import { validEventTypes } from "./eventTypes";
+import { validEventTypes } from "./EventTypes";
+import { HookData } from "./Types";
 
 const YAML = require("json2yaml");
 import chalk = require("chalk");
@@ -40,19 +41,20 @@ export const builder = (yargs: import("yargs").Argv) =>
     });
 
 export async function handler(argv: any) {
+  // Get existing service hooks
   const hooks = await getServiceHooks();
 
   // Filter by event type, if specified.
   let filtered = hooks.value;
   if (argv.event) {
-    filtered = hooks.value.filter((i: any) => i.eventType === argv.event);
+    filtered = hooks.value.filter((i: HookData) => i.eventType === argv.event);
   }
   // Print the entire response in verbose mode.
   if (argv.verbose == true) {
     console.log(chalk.bold.red`Unfiltered`, hooks);
     console.log(chalk.bold.red`Filtered`, filtered);
   } else {
-    filtered.map((i: any) => {
+    filtered.map((i: HookData) => {
       console.log(
         chalk`{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} on event {cyan ${i.eventDescription} }{magenta > }{cyan ${i.eventType}} to POST {green ${i.consumerInputs.url}}`
       );
