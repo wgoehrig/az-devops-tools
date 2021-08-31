@@ -1,6 +1,6 @@
 {
   "env": {
-    "browser": true,
+    "browser": false,
     "commonjs": true,
     "es2021": true
   },
@@ -12,7 +12,7 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "jsx-quotes": ["error", "prefer-double"],
-    "quotes": ["error", "double"],
+    "quotes": ["error", "double", { "allowTemplateLiterals": true }],
     "@typescript-eslint/no-var-requires": "off",
     "semi": ["error", "always"],
     "eslint@typescript-eslint/explicit-module-boundary-types": "off"
