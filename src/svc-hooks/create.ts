@@ -6,18 +6,11 @@ import * as fs from "fs";
 import { runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { validEventTypes } from "./eventTypes";
+import { HookInput, RepoData, ProjectData } from "./Types";
 
 const JS = require("js-yaml");
 
 import chalk = require("chalk");
-
-interface Hook {
-  org: string;
-  project: string;
-  eventType: string;
-  url: string;
-  eventSpecificArgs: any;
-}
 
 export const command = "create <file>";
 export const desc = "Create a service hook for a proj";
@@ -50,7 +43,7 @@ export async function handler(argv: any) {
   const azCommands: string[][] = [];
 
   // Check if hook data is missing any data
-  await Promise.all(hookData.map(async (hook: Hook) => {
+  await Promise.all(hookData.map(async (hook: HookInput) => {
     // Check if any keys are undefined | null
     if (!hook) {
       throw new Error(chalk.red("Missing data in file"));
@@ -127,26 +120,11 @@ export async function handler(argv: any) {
 }
 
 async function searchRepoId(name: string) {
-  interface Repo {
-    defaultBranch: string;
-    id: string;
-    isDisabled: boolean;
-    isFork: boolean;
-    name: string;
-    parentRepository: string | null | undefined;
-    project: any;
-    remoteUrl: string;
-    size: number;
-    sshUrl: string;
-    url: string;
-    validRemoteUrls: string | string[] | undefined | null;
-    webUrl: string;
-  }
 
   // Find the repo's id.
   const repos = await runAzCommand(["repos", "list"]);
   const desiredRepo = repos.find(
-    (repo: Repo) => repo.name.toLowerCase() === name.toLowerCase()
+    (repo: RepoData) => repo.name.toLowerCase() === name.toLowerCase()
   );
   if (desiredRepo === undefined) {
     throw new Error("Could not resolve repo id");
@@ -156,15 +134,6 @@ async function searchRepoId(name: string) {
 }
 
 async function searchProjId(org: string, project: string) {
-  interface Project {
-    id: string;
-    lastUpdateTime: string;
-    name: string;
-    revision: number;
-    state: string;
-    url: string;
-    visibility: string;
-  }
 
   const projects = await runAzCommand([
     "devops",
@@ -181,7 +150,7 @@ async function searchProjId(org: string, project: string) {
 
   // Get projectId of desired project
   const desiredProject = projects.value.find(
-    (proj: Project) => proj.name.toLowerCase() === project.toLowerCase()
+    (proj: ProjectData) => proj.name.toLowerCase() === project.toLowerCase()
   );
   if (desiredProject === undefined) {
     throw new Error("Could not resolve project id");
