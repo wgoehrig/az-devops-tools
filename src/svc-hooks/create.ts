@@ -4,8 +4,7 @@ import { startSpinner } from "../utils/MiscUtils";
 import { validEventTypes } from "./EventTypes";
 import { HookInput, RepoData, ProjectData } from "./Types";
 import { Argv } from "yargs";
-
-const JS = require("js-yaml");
+import * as YAML from "yaml";
 
 import chalk from "chalk";
 
@@ -29,8 +28,8 @@ export async function handler(argv: any) {
   let hookData: [];
   if (fileType === "json") {
     hookData = JSON.parse(fileContents);
-  } else if (fileType === "yml") {
-    hookData = JS.load(fileContents);
+  } else if (fileType === "yaml") {
+    hookData = YAML.parse(fileContents);
   } else {
     console.error(chalk.red("Invalid file type"));
     throw new Error("Invalid file type");

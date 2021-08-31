@@ -6,7 +6,7 @@ import { validEventTypes } from "./EventTypes";
 import { HookData } from "./Types";
 import { Argv } from "yargs";
 
-const YAML = require("json2yaml");
+import * as YAML from "yaml";
 import chalk from "chalk";
 
 export const command = "get";
@@ -65,9 +65,7 @@ export async function handler(argv: any) {
   // Write the output to file
   const fPath = path.join(
     argv.outDir,
-    `get${argv.event ? `_${argv.event}` : ""}.${
-      argv.outType === "yaml" ? "yml" : "json"
-    }`
+    `get${argv.event ? `_${argv.event}` : ""}.${argv.outType}`
   );
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);

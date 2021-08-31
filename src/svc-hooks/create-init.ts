@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { join } from "path";
 import { Argv } from "yargs";
 
-const YAML = require("json2yaml");
+import * as YAML from "yaml";
 
 export const command = "create-init";
 export const desc = "Initialize the YAML file for creating service hooks";
@@ -65,7 +65,7 @@ export function handler(argv: any) {
   // Write sample to output file
   const fPath = join(
     argv.outDir,
-    `create.${argv.outType === "yaml" ? "yml" : "json"}`
+    `create.${argv.outType}`
   );
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);

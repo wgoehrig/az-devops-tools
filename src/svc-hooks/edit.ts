@@ -4,7 +4,7 @@ import { startSpinner } from "../utils/MiscUtils";
 import { HookFormattedData } from "./Types";
 import { Argv } from "yargs";
 import chalk from "chalk";
-const JS = require("js-yaml");
+import * as YAML from "yaml";
 
 export const command = "edit <file>";
 export const desc =
@@ -27,8 +27,8 @@ export async function handler(argv: any) {
   let hookData: HookFormattedData[];
   if (fileType === "json") {
     hookData = JSON.parse(fileContents);
-  } else if (fileType === "yml") {
-    hookData = JS.load(fileContents);
+  } else if (fileType === "yaml") {
+    hookData = YAML.parse(fileContents);
   } else {
     console.error(chalk.red("Invalid file type"));
     throw new Error("Invalid file type");

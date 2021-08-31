@@ -24,9 +24,6 @@
     "worker-farm"
   ],
   "dependencies": {
-    "js-yaml": "^4.1.0",
-    "json2yaml": "^1.1.0",
-    "prompts": "^2.4.1",
     "worker-farm": "^1.7.0"
   },
   "devDependencies": {

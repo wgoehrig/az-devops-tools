@@ -4,8 +4,7 @@ import { validEventTypes } from "./EventTypes";
 import { getServiceHooks } from "./get";
 import { HookData, HookFormattedData } from "./Types";
 import { Argv } from "yargs";
-
-const YAML = require("json2yaml");
+import * as YAML from "yaml";
 
 export const command = "edit-init";
 export const desc = "Initialize the YAML file for editing service hooks";
@@ -60,7 +59,7 @@ export async function handler(argv: any) {
   // Write data to output file
   const fPath = join(
     argv.outDir,
-    `edit.${argv.outType === "yaml" ? "yml" : "json"}`
+    `edit.${argv.outType}`
   );
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
