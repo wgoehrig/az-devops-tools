@@ -5,6 +5,7 @@ import { HookFormattedData } from "./Types";
 import { Argv } from "yargs";
 import chalk from "chalk";
 import * as YAML from "yaml";
+import { extname } from "path";
 
 export const command = "edit <file>";
 export const desc =
@@ -20,14 +21,14 @@ export const builder = (yargs: import("yargs").Argv) =>
 export async function handler(argv: any) {
   // Open and read service hook from file
   const file = argv.file;
-  const fileType = argv.file.split(".").pop().toLowerCase();
+  const fileType = extname(file);
   const fileContents = fs.readFileSync(file, "utf8");
 
   // Parse service hook file contents
   let hookData: HookFormattedData[];
-  if (fileType === "json") {
+  if (fileType === ".json") {
     hookData = JSON.parse(fileContents);
-  } else if (fileType === "yaml") {
+  } else if (fileType === ".yaml") {
     hookData = YAML.parse(fileContents);
   } else {
     console.error(chalk.red("Invalid file type"));
