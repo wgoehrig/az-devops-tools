@@ -42,7 +42,7 @@ export async function getVarGroups(prefix?: string, outDir?: string, silent = fa
 
   const yamlStr = collection.toString();
   if (outDir && !silent) {
-    const filename = path.join(path.resolve(process.cwd(), outDir), `${prefix}.yaml`);
+    const filename = path.join(path.resolve(process.cwd(), outDir), `${prefix}.yml`);
     fs.writeFileSync(filename, yamlStr);
     console.log();
     console.log(chalk.bold`YAML file saved to {cyan ${filename}}`);

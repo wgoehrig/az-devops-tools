@@ -1,6 +1,7 @@
 import * as get from "./get";
+import * as edit from "./edit";
 import * as create from "./create";
-import * as test from "./test";
+import * as create_init from "./create-init";
 import yargs = require("yargs");
 import chalk from "chalk";
 
@@ -10,8 +11,9 @@ export function builder(yargs: import("yargs").Argv) {
   return yargs
     .updateStrings({"Commands:": chalk.cyan`Commands:`})
     .command(get)
+    .command(edit)
     .command(create)
-    .command(test);
+    .command(create_init);
 }
 export function handler(argv: import("yargs").Argv) {
   yargs.showHelp();

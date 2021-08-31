@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { validEventTypes } from "./eventTypes";
@@ -16,10 +17,18 @@ export const builder = (yargs: import("yargs").Argv) =>
       demandOption: false,
       describe: "The type of event to get hooks for",
     })
-    .option("file", {
-      alias: "F",
-      default: "get.yml",
-      describe: "File to write the output to",
+    .option("outDir", {
+      alias: "o",
+      default: ".",
+      describe: "Directory to write output file to",
+      type: "string",
+      normalize: true,
+    })
+    .option("outType", {
+      alias: "t",
+      describe: "The type of output to write",
+      choices: ["yaml", "json"],
+      default: "yaml",
       type: "string",
     })
     .option("verbose", {
@@ -28,20 +37,53 @@ export const builder = (yargs: import("yargs").Argv) =>
       demandOption: false,
       describe: "Verbose logging",
       type: "boolean",
-    })
-    .normalize("file");
-export function handler(argv: any) {
-  getServiceHooks(argv);
+    });
+
+export async function handler(argv: any) {
+  const hooks = await getServiceHooks();
+
+  // Filter by event type, if specified.
+  let filtered = hooks.value;
+  if (argv.event) {
+    filtered = hooks.value.filter((i: any) => i.eventType === argv.event);
+  }
+  // Print the entire response in verbose mode.
+  if (argv.verbose == true) {
+    console.log(chalk.bold.red`Unfiltered`, hooks);
+    console.log(chalk.bold.red`Filtered`, filtered);
+  } else {
+    filtered.map((i: any) => {
+      console.log(
+        chalk`{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} on event {cyan ${i.eventDescription} }{magenta > }{cyan ${i.eventType}} to POST {green ${i.consumerInputs.url}}`
+      );
+    });
+  }
+
+  // Write the output to file
+  const fPath = path.join(
+    argv.outDir,
+    `get${argv.event ? `_${argv.event}` : ""}.${
+      argv.outType === "yaml" ? "yml" : "json"
+    }`
+  );
+  if (!fs.existsSync(argv.outDir)) {
+    fs.mkdirSync(argv.outDir);
+  }
+  if (argv.outType === "yaml") {
+    fs.writeFileSync(fPath, YAML.stringify(filtered));
+  } else {
+    fs.writeFileSync(fPath, JSON.stringify(filtered, null, 2));
+  }
 }
 
-export async function getServiceHooks(argv: any) {
+export async function getServiceHooks() {
   /* GET request to https://dev.azure.com/<org>/_apis/hooks/consumers
   SUPER DUPER HACKY
   */
   const spinner = startSpinner(
     chalk`Requesting all service hooks via {bold az devops invoke} ...`
   );
-  const checks = await runAzCommand(
+  const hooks = await runAzCommand(
     [
       "devops",
       "invoke",
@@ -65,24 +107,5 @@ export async function getServiceHooks(argv: any) {
   );
   spinner.stop();
 
-  // Filter by event type, if specified.
-  let filtered = checks.value;
-  if (argv.event) {
-    filtered = checks.value.filter((i: any) => i.eventType === argv.event);
-  }
-  // Print the entire response in verbose mode.
-  if (argv.verbose == true) {
-    console.log(filtered);
-  } else {
-    filtered.map((i: any) => {
-      console.log(
-        chalk`{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} on event {cyan ${i.eventDescription} }{magenta > }{cyan ${i.eventType}} to POST {green ${i.consumerInputs.url}}`
-      );
-    });
-  }
-
-  // Write the output to a specific file.
-  if (argv.file) {
-    fs.writeFileSync(argv.file, YAML.stringify(filtered));
-  }
+  return hooks;
 }
