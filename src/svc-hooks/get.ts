@@ -55,11 +55,11 @@ export async function handler(argv: any) {
     console.log(chalk.bold.red`Unfiltered`, hooks);
     console.log(chalk.bold.red`Filtered`, filtered);
   } else {
-    filtered.map((i: HookData) => {
+    for (const i of filtered) {
       console.log(
         chalk`{gray ${i.actionDescription}} by {blue ${i.createdBy.uniqueName}} on event {cyan ${i.eventDescription} }{magenta > }{cyan ${i.eventType}} to POST {green ${i.consumerInputs.url}}`
       );
-    });
+    }
   }
 
   // Write the output to file
