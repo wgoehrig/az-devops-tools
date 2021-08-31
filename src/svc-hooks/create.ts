@@ -3,14 +3,15 @@ import { runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { validEventTypes } from "./EventTypes";
 import { HookInput, RepoData, ProjectData } from "./Types";
+import { Argv } from "yargs";
 
 const JS = require("js-yaml");
 
-import chalk = require("chalk");
+import chalk from "chalk";
 
 export const command = "create <file>";
 export const desc = "Create a service hook for a proj";
-export const builder = (yargs: import("yargs").Argv) =>
+export const builder = (yargs: Argv) =>
   yargs.positional("file", {
     alias: "F",
     describe: "File path containing new service hooks to be created",

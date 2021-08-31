@@ -2,14 +2,14 @@ import * as fs from "fs";
 import { runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { HookFormattedData } from "./Types";
-
-import chalk = require("chalk");
+import { Argv } from "yargs";
+import chalk from "chalk";
 const JS = require("js-yaml");
 
 export const command = "edit <file>";
 export const desc =
   "Edit a set of service hooks. Use svc-hooks edit-init to generate starter";
-export const builder = (yargs: import("yargs").Argv) =>
+export const builder = (yargs: Argv) =>
   yargs.positional("file", {
     alias: "F",
     describe: "File path containing existing service hooks to be updated",

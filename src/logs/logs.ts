@@ -7,4 +7,4 @@ export function builder(yargs: Argv) {
   return yargs
     .command(get);
 }
-export function handler(_argv: Argv) {}
+

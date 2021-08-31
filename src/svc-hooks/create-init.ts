@@ -1,11 +1,12 @@
 import * as fs from "fs";
 import { join } from "path";
+import { Argv } from "yargs";
 
 const YAML = require("json2yaml");
 
 export const command = "create-init";
 export const desc = "Initialize the YAML file for creating service hooks";
-export const builder = (yargs: import("yargs").Argv) =>
+export const builder = (yargs: Argv) =>
   yargs
     .option("outDir", {
       alias: "o",

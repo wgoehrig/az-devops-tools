@@ -4,13 +4,14 @@ import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { validEventTypes } from "./EventTypes";
 import { HookData } from "./Types";
+import { Argv } from "yargs";
 
 const YAML = require("json2yaml");
-import chalk = require("chalk");
+import chalk from "chalk";
 
 export const command = "get";
 export const desc = "Get a set of service hooks";
-export const builder = (yargs: import("yargs").Argv) =>
+export const builder = (yargs: Argv) =>
   yargs
     .option("event", {
       alias: "e",

@@ -3,12 +3,13 @@ import { join } from "path";
 import { validEventTypes } from "./EventTypes";
 import { getServiceHooks } from "./get";
 import { HookData, HookFormattedData } from "./Types";
+import { Argv } from "yargs";
 
 const YAML = require("json2yaml");
 
 export const command = "edit-init";
 export const desc = "Initialize the YAML file for editing service hooks";
-export const builder = (yargs: import("yargs").Argv) =>
+export const builder = (yargs: Argv) =>
   yargs
     .option("event", {
       alias: "e",
