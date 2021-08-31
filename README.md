@@ -4,7 +4,6 @@
 
 ```sh
 git clone https://github.com/wgoehrig/az-devops-tools/tree/log-tools
-git checkout log-tools
 npm ci
 npm run build
 az extension add --name azure-devops
