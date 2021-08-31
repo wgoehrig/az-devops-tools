@@ -1,0 +1,26 @@
+// See full list of event types and their required parameters here. https://docs.microsoft.com/en-us/azure/devops/service-hooks/events?view=azure-devops
+
+export const validEventTypes = [
+  "build.complete",
+  // "ms.vss-release.release-abandoned-event",
+  // "ms.vss-release.release-created-event",
+  // "ms.vss-release.deployment-approval-completed-event",
+  // "ms.vss-release.deployment-approval-pending-event",
+  // "ms.vss-release.deployment-completed-event",
+  // "ms.vss-release.deployment-started-event",
+  "ms.vss-pipelines.run-state-changed-event",
+  // "ms.vss-pipelines.stage-state-changed-event",
+  // "ms.vss-pipelinechecks-events.approval-pending",
+  // "ms.vss-pipelinechecks-events.approval-completed",
+  // "tfvc.checkin",
+  "git.push",
+  // "git.pullrequest.created",
+  // "git.pullrequest.merged",
+  // "git.pullrequest.updated",
+  // "workitem.created",
+  // "workitem.deleted",
+  // "workitem.restored",
+  // "workitem.updated",
+  // "workitem.commented",
+  // "message.posted",
+];

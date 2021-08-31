@@ -2,7 +2,7 @@ import { getAzConfig, runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { promptToConfirm, startSpinner } from "../utils/MiscUtils";
 import chalk = require("chalk");
 
-export const command = "copy-checks <source> <partialTarget>"
+export const command = "copy-checks <source> <partialTarget>";
 export const desc = chalk`Copies all checks from the <source> service connection to all service connections whose names contain <partialTarget>
 Note that {bold this will create duplicate checks} if they already exist in the target service connections!`;
 export const builder = (yargs: import("yargs").Argv) =>
@@ -113,7 +113,7 @@ function getArgsForDeleteCheck(check: any): string[] {
 
 
 async function getSvcConns(queryFilter: string): Promise<any[]> {
-  const spinner = startSpinner(chalk`Running {bold az devops service-endpoint list} ...`)  
+  const spinner = startSpinner(chalk`Running {bold az devops service-endpoint list} ...`);  
   const svcConns = await runAzCommand([
     "devops",
     "service-endpoint",
@@ -127,7 +127,7 @@ async function getSvcConns(queryFilter: string): Promise<any[]> {
 
 async function getChecks(svcConns: any[]): Promise<any[]> {
   const [_org, project] = getAzConfig();
-  const spinner = startSpinner(chalk`Running {bold az devops invoke} ...`)
+  const spinner = startSpinner(chalk`Running {bold az devops invoke} ...`);
   const checks = await runAzCommand([
     "devops",
     "invoke",

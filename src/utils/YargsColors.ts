@@ -51,7 +51,7 @@ const locale: any = {
   "command": chalk.bold.red`command`,
   "deprecated": chalk.bold.red`deprecated`,
   "deprecated: %s": chalk.bold.red`deprecated: %s`
-}
+};
 
 export function fixYargsColors() {
   yargs.updateLocale(locale);

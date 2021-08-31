@@ -4,7 +4,7 @@ import { getVarGroups } from "./get";
 import chalk = require("chalk");
 import { VarGroupCollection } from "./VarGroupCollection";
 
-export const command = "auth <prefix> <email>"
+export const command = "auth <prefix> <email>";
 export const desc = "Grant a user access to a set of variable groups";
 export const builder = (yargs: import("yargs").Argv) => yargs
   .positional("prefix", {
