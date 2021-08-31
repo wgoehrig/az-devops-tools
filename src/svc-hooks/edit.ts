@@ -34,7 +34,6 @@ export async function handler(argv: any) {
     throw new Error("Invalid file type");
   }
 
-  console.log(hookData);
 
   const spinner2 = startSpinner("Preparing service hooks and looking up any missing required data...");
   // Prepare our az commands.
@@ -83,7 +82,6 @@ export async function handler(argv: any) {
   spinner2.stop();
 
   // Start updating webhooks
-  console.log("azCommands", azCommands);
   const spinner = startSpinner(
     chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`
   );

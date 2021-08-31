@@ -106,13 +106,11 @@ export async function handler(argv: any) {
         "--in-file",
         JSON.stringify(hookDataFormatted),
       ]);
-      console.log("hookDataFormatted", hookDataFormatted);
     })
   );
   spinner2.stop();
 
   // Start creating webhooks
-  console.log("azCommands", azCommands);
   const spinner = startSpinner(
     chalk`Creating ${azCommands.length} service hooks...via {bold az devops invoke}`
   );

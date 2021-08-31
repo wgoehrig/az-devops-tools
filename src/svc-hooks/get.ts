@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import { validEventTypes } from "./EventTypes";
+import { validEventTypes } from "./eventTypes";
 
 const YAML = require("json2yaml");
 import chalk = require("chalk");
@@ -77,7 +77,7 @@ export async function handler(argv: any) {
 }
 
 export async function getServiceHooks() {
-  /* GET request to https://dev.azure.com/<org>/_apis/hooks/subscriptions
+  /* GET request to https://dev.azure.com/<org>/_apis/hooks/consumers
   SUPER DUPER HACKY
   */
   const spinner = startSpinner(
