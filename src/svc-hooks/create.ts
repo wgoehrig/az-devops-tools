@@ -42,73 +42,74 @@ export async function handler(argv: any) {
 
   const azCommands: string[][] = [];
 
-  // Check if hook data is missing any data
-  await Promise.all(hookData.map(async (hook: HookInput) => {
-    // Check if any keys are undefined | null
-    if (!hook) {
-      throw new Error(chalk.red("Missing data in file"));
-    }
+  await Promise.all(
+    hookData.map(async (hook: HookInput) => {
+      // Check if hook data is missing any data
+      if (!hook.org || !hook.project || !hook.eventType || !hook.url) {
+        throw new Error(chalk.red("Missing data in file"));
+      }
 
-    // Read necessary args from hookData
-    const hookDataFormatted = {
-      consumerActionId: "httpRequest",
-      consumerId: "webHooks",
-      consumerInputs: {
-        url: hook.url,
-      },
-      eventType: hook.eventType,
-      publisherId: hook.eventSpecificArgs.publisherId,
-      publisherInputs: {},
-      resourceVersion: "1.0",
-      scope: 1,
-    };
+      // Read necessary args from hookData
+      const hookDataFormatted = {
+        consumerActionId: "httpRequest",
+        consumerId: "webHooks",
+        consumerInputs: {
+          url: hook.url,
+        },
+        eventType: hook.eventType,
+        publisherId: hook.eventSpecificArgs.publisherId,
+        publisherInputs: {},
+        resourceVersion: "1.0",
+        scope: 1,
+      };
 
-    // Check if eventType is valid, populated publisherInputs
-    switch (hook.eventType) {
-      case "build.complete":
-        hookDataFormatted.publisherInputs = {
-          definitionName: hook.eventSpecificArgs.definitionName,
-          buildStatus: hook.eventSpecificArgs.buildStatus,
-        };
-        break;
-      case "ms.vss-pipelines.stage-state-changed-event":
-        hookDataFormatted.publisherInputs = {
-          pipelineId: hook.eventSpecificArgs.pipelineId,
-          stageNameId: hook.eventSpecificArgs.stageNameId,
-          stageStateId: hook.eventSpecificArgs.stageStateId,
-        };
-        break;
-      case "git.push":
-        hookDataFormatted.publisherInputs = {
-          projectId: await searchProjId(hook.org, hook.project), // FIXME: WHY ARENT YOU AWAITING
-          repository: await searchRepoId(hook.eventSpecificArgs.repoName),
-          branch: hook.eventSpecificArgs.branch,
-          pushedBy: hook.eventSpecificArgs.pushedBy,
-        };
-        break;
-      default:
-        throw new Error(chalk.red("Invalid event type"));
-    }
+      // Check if eventType is valid, populated publisherInputs
+      switch (hook.eventType) {
+        case "build.complete":
+          hookDataFormatted.publisherInputs = {
+            definitionName: hook.eventSpecificArgs.definitionName,
+            buildStatus: hook.eventSpecificArgs.buildStatus,
+          };
+          break;
+        case "ms.vss-pipelines.stage-state-changed-event":
+          hookDataFormatted.publisherInputs = {
+            pipelineId: hook.eventSpecificArgs.pipelineId,
+            stageNameId: hook.eventSpecificArgs.stageNameId,
+            stageStateId: hook.eventSpecificArgs.stageStateId,
+          };
+          break;
+        case "git.push":
+          hookDataFormatted.publisherInputs = {
+            projectId: await searchProjId(hook.org, hook.project), // FIXME: WHY ARENT YOU AWAITING
+            repository: await searchRepoId(hook.eventSpecificArgs.repoName),
+            branch: hook.eventSpecificArgs.branch,
+            pushedBy: hook.eventSpecificArgs.pushedBy,
+          };
+          break;
+        default:
+          throw new Error(chalk.red("Invalid event type"));
+      }
 
-    azCommands.push([
-      "devops",
-      "invoke",
-      "--route-parameters",
-      "hubName=../../hooks/subscriptions",
-      "--area",
-      "distributedtask",
-      "--resource",
-      "hublicense",
-      "--api-version",
-      "6.1-preview",
-      "--http-method",
-      "POST",
-      "--only-show-errors",
-      "--in-file",
-      JSON.stringify(hookDataFormatted),
-    ]);
-    console.log("hookDataFormatted", hookDataFormatted);
-  }));
+      azCommands.push([
+        "devops",
+        "invoke",
+        "--route-parameters",
+        "hubName=../../hooks/subscriptions",
+        "--area",
+        "distributedtask",
+        "--resource",
+        "hublicense",
+        "--api-version",
+        "6.1-preview",
+        "--http-method",
+        "POST",
+        "--only-show-errors",
+        "--in-file",
+        JSON.stringify(hookDataFormatted),
+      ]);
+      console.log("hookDataFormatted", hookDataFormatted);
+    })
+  );
 
   // Start creating webhooks
   console.log("azCommands", azCommands);
@@ -120,7 +121,6 @@ export async function handler(argv: any) {
 }
 
 async function searchRepoId(name: string) {
-
   // Find the repo's id.
   const repos = await runAzCommand(["repos", "list"]);
   const desiredRepo = repos.find(
@@ -134,7 +134,6 @@ async function searchRepoId(name: string) {
 }
 
 async function searchProjId(org: string, project: string) {
-
   const projects = await runAzCommand([
     "devops",
     "invoke",
