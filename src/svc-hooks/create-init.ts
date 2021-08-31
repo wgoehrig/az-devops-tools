@@ -1,8 +1,7 @@
 import * as fs from "fs";
 import { join } from "path";
-import { Argv } from "yargs";
-
 import * as YAML from "yaml";
+
 
 export const command = "create-init";
 export const desc = "Initialize the YAML file for creating service hooks";

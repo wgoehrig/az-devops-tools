@@ -1,11 +1,10 @@
-import * as get from "./get";
-import * as edit from "./edit";
-import * as edit_init from "./edit-init";
+import chalk from "chalk";
 import * as create from "./create";
 import * as create_init from "./create-init";
+import * as edit from "./edit";
+import * as edit_init from "./edit-init";
+import * as get from "./get";
 import yargs = require("yargs");
-import chalk from "chalk";
-import { Argv } from "yargs";
 
 export const command = "svc-hooks <command>";
 export const desc = "Manage collections of related service hooks";

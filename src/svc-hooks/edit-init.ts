@@ -1,10 +1,9 @@
 import * as fs from "fs";
 import { join } from "path";
+import * as YAML from "yaml";
 import { validEventTypes } from "./EventTypes";
 import { getServiceHooks } from "./get";
 import { HookData, HookFormattedData } from "./Types";
-import { Argv } from "yargs";
-import * as YAML from "yaml";
 
 export const command = "edit-init";
 export const desc = "Initialize the YAML file for editing service hooks";

@@ -1,13 +1,12 @@
+import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
+import * as YAML from "yaml";
 import { runAzCommand } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { validEventTypes } from "./EventTypes";
 import { HookData } from "./Types";
-import { Argv } from "yargs";
 
-import * as YAML from "yaml";
-import chalk from "chalk";
 
 export const command = "get";
 export const desc = "Get a set of service hooks";

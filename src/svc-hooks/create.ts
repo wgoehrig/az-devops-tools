@@ -1,13 +1,10 @@
+import chalk from "chalk";
 import * as fs from "fs";
+import * as YAML from "yaml";
 import { runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import { validEventTypes } from "./EventTypes";
-import { HookInput, RepoData, ProjectData } from "./Types";
-import { Argv } from "yargs";
-import * as YAML from "yaml";
-import { extname } from "path";
+import { HookInput, ProjectData, RepoData } from "./Types";
 
-import chalk from "chalk";
 
 export const command = "create <file>";
 export const desc = "Create a service hook for a proj";

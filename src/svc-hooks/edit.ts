@@ -1,11 +1,9 @@
+import chalk from "chalk";
 import * as fs from "fs";
+import * as YAML from "yaml";
 import { runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
 import { HookFormattedData } from "./Types";
-import { Argv } from "yargs";
-import chalk from "chalk";
-import * as YAML from "yaml";
-import { extname } from "path";
 
 export const command = "edit <file>";
 export const desc =
