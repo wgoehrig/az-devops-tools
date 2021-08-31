@@ -1,14 +1,21 @@
 import * as fs from "fs";
 import { join } from "path";
-
+import { validEventTypes } from "./EventTypes";
 import { getServiceHooks } from "./get";
 import { HookData, HookFormattedData } from "./Types";
+
 const YAML = require("json2yaml");
 
 export const command = "edit-init";
 export const desc = "Initialize the YAML file for editing service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs
+    .option("event", {
+      alias: "e",
+      choices: validEventTypes,
+      demandOption: false,
+      describe: "The type of event to get hooks for",
+    })
     .option("outDir", {
       alias: "o",
       default: ".",
@@ -25,11 +32,17 @@ export const builder = (yargs: import("yargs").Argv) =>
     });
 export async function handler(argv: any) {
   // Get existing service hooks
-  const hooks = (await getServiceHooks()).value;
-  
-  // Format existig hook data
+  const hooks = await getServiceHooks();
+
+  // Filter by event type, if specified.
+  let filtered = hooks.value;
+  if (argv.event) {
+    filtered = hooks.value.filter((i: HookData) => i.eventType === argv.event);
+  }
+
+  // Format existing hook data
   const hooksFormatted: HookFormattedData[] = [];
-  hooks.map((hook: HookData) => {
+  filtered.map((hook: HookData) => {
     hooksFormatted.push({
       consumerActionId: hook.consumerActionId,
       consumerId: hook.consumerId,
