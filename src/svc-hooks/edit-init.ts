@@ -9,7 +9,7 @@ const YAML = require("json2yaml");
 
 export const command = "edit-init";
 export const desc = "Initialize the YAML file for editing service hooks";
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs
     .option("event", {
       alias: "e",

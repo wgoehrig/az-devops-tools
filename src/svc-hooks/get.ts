@@ -11,7 +11,7 @@ import chalk from "chalk";
 
 export const command = "get";
 export const desc = "Get a set of service hooks";
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs
     .option("event", {
       alias: "e",

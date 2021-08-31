@@ -11,7 +11,7 @@ import chalk from "chalk";
 
 export const command = "create <file>";
 export const desc = "Create a service hook for a proj";
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("file", {
     alias: "F",
     describe: "File path containing new service hooks to be created",

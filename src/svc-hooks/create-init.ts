@@ -6,7 +6,7 @@ const YAML = require("json2yaml");
 
 export const command = "create-init";
 export const desc = "Initialize the YAML file for creating service hooks";
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs
     .option("outDir", {
       alias: "o",

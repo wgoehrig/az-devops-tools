@@ -32,7 +32,7 @@ export function displayValue(v: ValueType): string {
   if (v === undefined || isDeleted(v))
     return chalk.bgRed("     ");
   if (v === "")
-    return chalk.bgRedBright.black(" \"\" ");
+    return chalk.bgRedBright.black(` "" `);
   if (v === null)
     return chalk.bgRedBright.black("null");
 

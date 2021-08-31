@@ -9,7 +9,7 @@ import { Argv } from "yargs";
 
 export const command = "svc-hooks <command>";
 export const desc = "Manage collections of related service hooks";
-export function builder(yargs: Argv) {
+export function builder(yargs: import("yargs").Argv) {
   return yargs
     .updateStrings({ "Commands:": chalk.cyan`Commands:` })
     .command(get)

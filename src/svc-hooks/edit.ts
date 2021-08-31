@@ -9,7 +9,7 @@ const JS = require("js-yaml");
 export const command = "edit <file>";
 export const desc =
   "Edit a set of service hooks. Use svc-hooks edit-init to generate starter";
-export const builder = (yargs: Argv) =>
+export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("file", {
     alias: "F",
     describe: "File path containing existing service hooks to be updated",

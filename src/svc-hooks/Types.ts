@@ -5,6 +5,7 @@ export interface HookInput {
   url: string;
   eventSpecificArgs: any;
 }
+
 export interface HookData extends HookFormattedData{
   _links: any;
   actionDescription: string;
