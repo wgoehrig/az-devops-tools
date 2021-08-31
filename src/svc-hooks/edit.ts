@@ -1,8 +1,6 @@
 import * as fs from "fs";
-import { runAzCommand, runAzParallel } from "../utils/AzUtils";
+import { runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import { validEventTypes } from "./eventTypes";
-
 import { HookFormattedData } from "./Types";
 
 import chalk = require("chalk");
@@ -26,54 +24,69 @@ export async function handler(argv: any) {
   const fileContents = fs.readFileSync(file, "utf8");
 
   // Parse service hook file contents
-  let hookData: [];
+  let hookData: HookFormattedData[];
   if (fileType === "json") {
     hookData = JSON.parse(fileContents);
   } else if (fileType === "yml") {
     hookData = JS.load(fileContents);
   } else {
     console.error(chalk.red("Invalid file type"));
-    throw new Error(chalk.red("Invalid file type"));
+    throw new Error("Invalid file type");
   }
 
   console.log(hookData);
-  
 
+  const spinner2 = startSpinner("Preparing service hooks and looking up any missing required data...");
   // Prepare our az commands.
   const azCommands: string[][] = [];
-  await Promise.all(hookData.map(async (hook: HookFormattedData) => {
-    // Check if hook data is missing any data
-    if (!hook.consumerActionId || !hook.consumerId || !hook.consumerInputs || !hook.eventType || !hook.id || !hook.publisherId || !hook.publisherInputs || !hook.resourceVersion) {  
-      throw new Error(chalk.red("Missing data in file"));
-    }
+  await Promise.all(
+    hookData.map(async (hook: HookFormattedData) => {
+      // Check if hook data is missing any data
+      if (
+        !hook.consumerActionId ||
+        !hook.consumerId ||
+        !hook.consumerInputs ||
+        !hook.eventType ||
+        !hook.id ||
+        !hook.publisherId ||
+        !hook.publisherInputs ||
+        !hook.resourceVersion
+      ) {
+        throw new Error("Missing data in file");
+      }
 
-    const hookDataFormatted: any = hook;
-    hookDataFormatted.scope = "1.0";
-    
-    azCommands.push([
-      "devops",
-      "invoke",
-      "--route-parameters",
-      "hubName=../../hooks/subscriptions",
-      "--area",
-      "distributedtask",
-      "--resource",
-      "hublicense",
-      "--api-version",
-      "6.1-preview",
-      "--http-method",
-      "PUT",
-      "--only-show-errors",
-      "--in-file",
-      JSON.stringify(hookDataFormatted),
-    ]);
-  }));
+      // Add the scope property, hardcoded in Azure API.
+      const hookDataFormatted: any = hook; // The type should be HookFormattdData with a .scope property.
+      hookDataFormatted.scope = "1.0";
 
-   // Start updating webhooks
-   console.log("azCommands", azCommands);
-   const spinner = startSpinner(
-     chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`
-   );
-   await runAzParallel(azCommands, { inFile: true });
-   spinner.stop();
+      // Add command to azCommands, so we can run it in parallel later
+      // PUT request to https://dev.azure.com/<org>/_apis/hooks/subscription 
+      azCommands.push([
+        "devops",
+        "invoke",
+        "--route-parameters",
+        "hubName=../../hooks/subscriptions",
+        "--area",
+        "distributedtask",
+        "--resource",
+        "hublicense",
+        "--api-version",
+        "6.1-preview",
+        "--http-method",
+        "PUT",
+        "--only-show-errors",
+        "--in-file",
+        JSON.stringify(hookDataFormatted),
+      ]);
+    })
+  );
+  spinner2.stop();
+
+  // Start updating webhooks
+  console.log("azCommands", azCommands);
+  const spinner = startSpinner(
+    chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`
+  );
+  await runAzParallel(azCommands, { inFile: true });
+  spinner.stop();
 }

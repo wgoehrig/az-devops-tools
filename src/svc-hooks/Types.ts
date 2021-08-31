@@ -5,7 +5,7 @@ export interface HookInput {
   url: string;
   eventSpecificArgs: any;
 }
-export interface HookData {
+export interface HookData extends HookFormattedData{
   _links: any;
   actionDescription: string;
   consumerActionId: string;
@@ -28,12 +28,12 @@ export interface HookData {
 }
 
 export interface HookFormattedData {
-  consumerActionId: any;
-  consumerId: any;
+  consumerActionId: string;
+  consumerId: string;
   consumerInputs: any;
-  eventType: any;
-  id: any;
-  publisherId: any;
+  eventType: string;
+  id: string;
+  publisherId: string;
   publisherInputs: any;
   resourceVersion: string;
 }

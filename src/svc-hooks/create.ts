@@ -1,11 +1,7 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// https://docs.microsoft.com/en-us/azure/devops/service-hooks/create-subscription?view=azure-devops#create-a-subscription-for-a-org
-
 import * as fs from "fs";
 import { runAzCommand, runAzParallel } from "../utils/AzUtils";
 import { startSpinner } from "../utils/MiscUtils";
-import { validEventTypes } from "./eventTypes";
+import { validEventTypes } from "./EventTypes";
 import { HookInput, RepoData, ProjectData } from "./Types";
 
 const JS = require("js-yaml");
@@ -17,8 +13,7 @@ export const desc = "Create a service hook for a proj";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("file", {
     alias: "F",
-    describe:
-      "File path containing HTTP headers to send with the webhook's POST request",
+    describe: "File path containing new service hooks to be created",
     type: "string",
     normalize: true,
   });
@@ -37,16 +32,18 @@ export async function handler(argv: any) {
     hookData = JS.load(fileContents);
   } else {
     console.error(chalk.red("Invalid file type"));
-    throw new Error(chalk.red("Invalid file type"));
+    throw new Error("Invalid file type");
   }
 
   const azCommands: string[][] = [];
 
+  const spinner2 = startSpinner("Preparing service hooks and looking up any missing required data...");
+  // Prepare our az commands.
   await Promise.all(
     hookData.map(async (hook: HookInput) => {
       // Check if hook data is missing any data
       if (!hook.org || !hook.project || !hook.eventType || !hook.url) {
-        throw new Error(chalk.red("Missing data in file"));
+        throw new Error("Missing data in file");
       }
 
       // Read necessary args from hookData
@@ -80,16 +77,18 @@ export async function handler(argv: any) {
           break;
         case "git.push":
           hookDataFormatted.publisherInputs = {
-            projectId: await searchProjId(hook.org, hook.project), // FIXME: WHY ARENT YOU AWAITING
+            projectId: await searchProjId(hook.org, hook.project),
             repository: await searchRepoId(hook.eventSpecificArgs.repoName),
             branch: hook.eventSpecificArgs.branch,
             pushedBy: hook.eventSpecificArgs.pushedBy,
           };
           break;
         default:
-          throw new Error(chalk.red("Invalid event type"));
+          throw new Error("Invalid event type");
       }
 
+      // Add command to azCommands, so we can run it in parallel later
+      // POST request to https://dev.azure.com/<org>/_apis/hooks/subscriptions
       azCommands.push([
         "devops",
         "invoke",
@@ -110,6 +109,7 @@ export async function handler(argv: any) {
       console.log("hookDataFormatted", hookDataFormatted);
     })
   );
+  spinner2.stop();
 
   // Start creating webhooks
   console.log("azCommands", azCommands);

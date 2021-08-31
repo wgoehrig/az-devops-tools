@@ -24,11 +24,12 @@ export const builder = (yargs: import("yargs").Argv) =>
       choices: ["yaml", "json"],
     });
 export async function handler(argv: any) {
+  // Get existing service hooks
   const hooks = (await getServiceHooks()).value;
   
+  // Format existig hook data
   const hooksFormatted: HookFormattedData[] = [];
   hooks.map((hook: HookData) => {
-    hook;
     hooksFormatted.push({
       consumerActionId: hook.consumerActionId,
       consumerId: hook.consumerId,
@@ -38,8 +39,8 @@ export async function handler(argv: any) {
       publisherId: hook.publisherId,
       publisherInputs: hook.publisherInputs,
       resourceVersion: "1.0",
+      // Don't include scope: 1 here, it's hardcoded in the Azure API.
     });
-
   });
 
   // Write data to output file
