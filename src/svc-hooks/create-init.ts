@@ -54,7 +54,7 @@ export function handler(argv: any) {
   ];
 
   // Write sample to output file
-  const fPath = join(argv.outDir, `create.${argv.outType}`);
+  const fPath = join(argv.outDir, `create.yaml`);
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }

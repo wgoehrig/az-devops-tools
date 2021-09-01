@@ -49,7 +49,7 @@ export async function handler(argv: any) {
   });
 
   // Write data to output file
-  const fPath = join(argv.outDir, `edit.${argv.outType}`);
+  const fPath = join(argv.outDir, `edit.yaml`);
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }
