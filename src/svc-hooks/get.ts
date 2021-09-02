@@ -8,7 +8,7 @@ import { validEventTypes } from "./EventTypes";
 import { HookData } from "./Types";
 
 
-export const command = "get";
+export const command = "get [options]";
 export const desc = "Get a set of service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs

@@ -7,7 +7,7 @@ import { HookFormattedData } from "./Types";
 
 export const command = "edit <file>";
 export const desc =
-  "Edit a set of service hooks. Use svc-hooks edit-init to generate starter";
+  "Edit service hook(s) from a supplied YAML file";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("file", {
     alias: "F",
@@ -74,4 +74,5 @@ export async function handler(argv: any) {
   spinner.text = chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`;
   await runAzParallel(azCommands, { inFile: true });
   spinner.stop();
+  console.log(chalk.green`Successfully edited some service hooks`);
 }

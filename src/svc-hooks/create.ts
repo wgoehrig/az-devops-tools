@@ -7,7 +7,7 @@ import { HookInput, ProjectData, RepoData } from "./Types";
 
 
 export const command = "create <file>";
-export const desc = "Create a service hook for a proj";
+export const desc = "Create service hook(s) from a supplied YAML file";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("file", {
     alias: "F",
@@ -108,6 +108,7 @@ export async function handler(argv: any) {
   spinner.text = chalk`Creating ${azCommands.length} service hooks...via {bold az devops invoke}`;
   await runAzParallel(azCommands, { inFile: true });
   spinner.stop();
+  console.log(chalk.green`Successfully created some service hooks`);
 }
 
 async function searchRepoId(name: string) {

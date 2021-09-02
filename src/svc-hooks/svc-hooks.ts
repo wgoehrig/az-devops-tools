@@ -12,10 +12,10 @@ export function builder(yargs: import("yargs").Argv) {
   return yargs
     .updateStrings({ "Commands:": chalk.cyan`Commands:` })
     .command(get)
-    .command(edit)
     .command(edit_init)
-    .command(create)
-    .command(create_init);
+    .command(edit)
+    .command(create_init)
+    .command(create);
 }
 export function handler(argv: any) {
   yargs.showHelp();

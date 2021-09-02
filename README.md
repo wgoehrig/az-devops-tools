@@ -8,12 +8,29 @@ npm ci
 npm run build
 az extension add --name azure-devops
 az devops configure --defaults organization="https://dev.azure.com/<ORGANIZATION>" project="<PROJECT>"
-node .
+node . # See possible commands
 ```
 
-## FAQ
+### Webhooks/Service hooks (svc-hooks)
 
-### Webhooks (svc-hooks)
+**View some webhooks**
+
+`svc-hooks get` but this is pretty verbose. Use --verbose for even more verbosity.
+
+**Create some webhooks**
+
+1. `svc-hooks create-init`
+2. Fill in the required fields in the generated YAML file.
+3. `svc-hooks create <file>`
+
+**Edit some existing webhooks**
+
+1. `svc-hooks edit-init`
+2. Edit fields in the generated YAML file.
+3. Remove any webhook entries you don't want to change. _This is recommended to avoid unexpected errors._
+4. `svc-hooks edit <file>`
+
+## FAQ
 
 **I keep getting an error about null keys and/or missing data in file.**
 
