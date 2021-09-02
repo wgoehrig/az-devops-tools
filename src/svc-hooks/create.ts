@@ -41,35 +41,40 @@ export async function handler(argv: any) {
         consumerId: "webHooks",
         consumerInputs: {
           url: hook.url,
+          acceptUntrustedCerts: hook.eventSpecificArgs.acceptUntrustedCerts,
         },
         eventType: hook.eventType,
         publisherId: hook.eventSpecificArgs.publisherId,
         publisherInputs: {},
-        resourceVersion: "1.0",
+        "resourceVersion": "5.1-preview.1",
         scope: 1,
       };
 
       // Check if eventType is valid, populated publisherInputs
       switch (hook.eventType) {
         case "build.complete":
+          hookDataFormatted.consumerInputs.acceptUntrustedCerts = hook.eventSpecificArgs.acceptUntrustedCerts;
           hookDataFormatted.publisherInputs = {
-            definitionName: hook.eventSpecificArgs.definitionName,
             buildStatus: hook.eventSpecificArgs.buildStatus,
+            definitionName: hook.eventSpecificArgs.pipelineName,
+            projectId: await searchProjId(hook.org, hook.project),
           };
           break;
         case "ms.vss-pipelines.stage-state-changed-event":
           hookDataFormatted.publisherInputs = {
-            pipelineId: hook.eventSpecificArgs.pipelineId,
+            pipelineId: hook.eventSpecificArgs.buildDefinitionId, // TODO: Figure out which input is best and how to get pipelineId from it.
             stageNameId: hook.eventSpecificArgs.stageNameId,
             stageStateId: hook.eventSpecificArgs.stageStateId,
+            stageResultId: hook.eventSpecificArgs.stageResultId,
+            projectId: await searchProjId(hook.org, hook.project),
           };
           break;
         case "git.push":
           hookDataFormatted.publisherInputs = {
-            projectId: await searchProjId(hook.org, hook.project),
-            repository: await searchRepoId(hook.eventSpecificArgs.repoName),
             branch: hook.eventSpecificArgs.branch,
+            projectId: await searchProjId(hook.org, hook.project),
             pushedBy: hook.eventSpecificArgs.pushedBy,
+            repository: await searchRepoId(hook.eventSpecificArgs.repoName),
           };
           break;
         default:

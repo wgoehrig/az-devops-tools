@@ -24,12 +24,12 @@ export async function handler(argv: any) {
   // Parse service hook file contents
   const hookData: HookFormattedData[] = YAML.parse(fileContents);
 
-  const spinner = startSpinner("Preparing service hooks and looking up any missing required data...");
+  const spinner = startSpinner("Preparing service hooks...");
   // Prepare our az commands.
   const azCommands: string[][] = [];
   await Promise.all(
     hookData.map(async (hook: HookFormattedData) => {
-      // Check if hook data is missing any data
+      // Check if hook data is missing any data. No need to type-check, since the type is the same as what az returned to us.
       if (
         !hook.consumerActionId ||
         !hook.consumerId ||

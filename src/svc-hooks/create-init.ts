@@ -2,7 +2,6 @@ import * as fs from "fs";
 import { join } from "path";
 import * as YAML from "yaml";
 
-
 export const command = "create-init";
 export const desc = "Initialize the YAML file for creating service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
@@ -22,8 +21,9 @@ export function handler(argv: any) {
       eventType: "build.complete",
       url: null,
       eventSpecificArgs: {
-        definitionName: null,
-        buildStatus: null,
+        pipelineName: "'' | <pipeline-name>",
+        buildStatus: "'' | Succeeded | PartiallySucceeded | Failed | Stopped",
+        acceptUntrustedCerts: true,
         publisherId: "tfs",
       },
     },
@@ -33,9 +33,11 @@ export function handler(argv: any) {
       eventType: "ms.vss-pipelines.stage-state-changed-event",
       url: null,
       eventSpecificArgs: {
-        pipelineId: null,
-        stageNameId: null,
-        stageStateId: null,
+        buildDefinitionId: "'<defintionId-as-string-from-pipeline-link>'",
+        stageNameId: "'' | __default ",
+        stageStateId: "'' | NotStarted | Waiting | Running | Completed",
+        stageResultId: "",
+        acceptUntrustedCerts: true,
         publisherId: "pipelines",
       },
     },
@@ -45,9 +47,10 @@ export function handler(argv: any) {
       eventType: "git.push",
       url: null,
       eventSpecificArgs: {
-        repoName: null,
-        branch: null,
-        pushedBy: null,
+        repoName: "'' | <repo-name>",
+        branch: "'' | <branch-name>",
+        pushedBy: "",
+        acceptUntrustedCerts: true,
         publisherId: "tfs",
       },
     },

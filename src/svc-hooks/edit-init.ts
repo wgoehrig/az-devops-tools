@@ -43,7 +43,7 @@ export async function handler(argv: any) {
       id: hook.id,
       publisherId: hook.publisherId,
       publisherInputs: hook.publisherInputs,
-      resourceVersion: "1.0",
+      "resourceVersion": "5.1-preview.1",
       // Don't include scope: 1 here, it's hardcoded in the Azure API.
     });
   });
