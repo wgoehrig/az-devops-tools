@@ -62,7 +62,7 @@ export async function handler(argv: any) {
           break;
         case "ms.vss-pipelines.stage-state-changed-event":
           hookDataFormatted.publisherInputs = {
-            pipelineId: hook.eventSpecificArgs.buildDefinitionId, // TODO: Figure out which input is best and how to get pipelineId from it.
+            pipelineId: hook.eventSpecificArgs.buildDefinitionId,
             stageNameId: hook.eventSpecificArgs.stageNameId,
             stageStateId: hook.eventSpecificArgs.stageStateId,
             stageResultId: hook.eventSpecificArgs.stageResultId,
