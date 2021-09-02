@@ -29,7 +29,7 @@ export async function handler(argv: any) {
   const azCommands: string[][] = [];
   await Promise.all(
     hookData.map(async (hook: HookFormattedData) => {
-      // Check if hook data is missing any data. No need to type-check, since the type is the same as what az returned to us.
+      // Check if hook data is missing any data. No need to type-check, since az's payload type is identical to the request payload type.
       if (
         !hook.consumerActionId ||
         !hook.consumerId ||
