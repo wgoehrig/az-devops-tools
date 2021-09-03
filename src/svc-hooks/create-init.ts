@@ -60,7 +60,7 @@ export function handler(argv: any) {
           null,
           " https://dev.azure.com/<organization>/<project></project>/_build?definitionId=<buildDefinitionId>"
         ),
-        stageNameId: new ValWithComment("", " '' | __default "),
+        stageNameId: new ValWithComment("", " '' | __default | <stage-name>"),
         stageStateId: new ValWithComment(
           "",
           " '' | NotStarted | Waiting | Running | Completed"
