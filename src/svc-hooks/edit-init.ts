@@ -50,7 +50,10 @@ export async function handler(argv: any) {
   });
 
   // Write data to output file
-  const fPath = join(argv.outDir, "edit.yaml");
+  const fPath = join(
+    argv.outDir,
+    `edit${argv.event ? `_${argv.event}` : ""}.yaml`
+  );
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }

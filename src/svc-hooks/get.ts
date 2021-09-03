@@ -9,7 +9,7 @@ import { HookData } from "./Types";
 
 
 export const command = "get [options]";
-export const desc = "Get a set of service hooks";
+export const desc = "Get service hook(s)";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs
     .option("event", {

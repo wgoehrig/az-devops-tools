@@ -104,5 +104,7 @@ dist
 
 lib
 
-# Files created by svc-hooks *-init
-*.yaml
+# Files created by `svc-hooks *-init`
+get*.yaml
+edit.yaml
+create.yaml

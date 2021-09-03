@@ -58,7 +58,7 @@ export function handler(argv: any) {
       eventSpecificArgs: {
         buildDefinitionId: new ValWithComment(
           null,
-          " <defintionId-as-string-from-pipeline-link>"
+          " https://dev.azure.com/<organization>/<project></project>/_build?definitionId=<buildDefinitionId>"
         ),
         stageNameId: new ValWithComment("", " '' | __default "),
         stageStateId: new ValWithComment(
