@@ -1,7 +1,7 @@
 {
   "name": "az-devops-tools",
   "description": "Tools that wrap the az CLI to make certain DevOps tasks a bit less painful.",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "author": "Bill Goehrig",
   "license": "MIT",
   "engines": {
