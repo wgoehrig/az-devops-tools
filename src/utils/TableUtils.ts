@@ -1,14 +1,14 @@
 import { getBorderCharacters, table } from "table";
-import yargs = require("yargs");
-import { VarGroupCollection } from "../vargroups/VarGroupCollection";
-import chalk = require("chalk");
+import { VarGroupCollection } from "../vargroups/VarGroupCollection.js";
+import chalk from "chalk";
+const terminalWidth = process.stdout.columns ?? 150;
 
 function sum(x: number[]) {
   return x.reduce((a, b) => a + b, 0);
 }
 
 function splitTable(data: string[][], widths: number[]): any[] {
-  if (sum(widths) + 3 * widths.length + 4 <= yargs.terminalWidth())
+  if (sum(widths) + 3 * widths.length + 4 <= terminalWidth)
     return [data];
 
   const tables: any[] = [];
@@ -25,7 +25,7 @@ function splitTable(data: string[][], widths: number[]): any[] {
 
   while (endIdx < widths.length) {
     curWidth += 3 + widths[endIdx];
-    if (curWidth > yargs.terminalWidth())
+    if (curWidth > terminalWidth)
       pushTable();
 
     endIdx++;
@@ -39,7 +39,7 @@ export function printTable(data: VarGroupCollection) {
   rows[0] = ["  ", ...data.aliases.map((v) => chalk.bold(v))];
   let i = 1;
 
-  const maxColWidth = Math.floor(Math.max(yargs.terminalWidth() / 10, 36));
+  const maxColWidth = Math.floor(Math.max(terminalWidth / 10, 36));
   const maxWidths = new Array(data.aliases.length + 1).fill(5);
   maxWidths[0] = Math.max(...data.varNames.map((v) => v.length));
   const aliases = data.aliases;

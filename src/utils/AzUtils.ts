@@ -1,14 +1,17 @@
-import chalk = require("chalk");
+import chalk from "chalk";
 import * as child_process from "child_process";
 import * as ini from "ini";
 import * as os from "os";
 import * as path from "path";
 import * as fs from "fs";
 import * as util from "util";
-import * as which from "which";
+import which from "which";
 import workerFarm from "worker-farm";
-import { startSpinner } from "./MiscUtils";
+import { startSpinner } from "./MiscUtils.js";
 import { v4 as uuidv4 } from "uuid";
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 const { quoteForShell } = require("puka");
 const execFile = util.promisify(child_process.execFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -26,8 +29,13 @@ const defaultAzOptions: AzOptions = {
 
 export async function runAzParallel(argSets: string[][], options: Partial<AzOptions>={}): Promise<any[]> {
   const spinner = startSpinner(chalk`Running {bold ${argSets.length}} az commands on {bold ${Math.min(os.cpus().length, argSets.length)}} threads`);
-  const workers = workerFarm({ maxRetries: 0, }, __filename, ["runAzInWorker"]);
-  const promises: Promise<any>[] = [];
+
+  // FIXME: This is a hack to get around the fact that worker-farm doesn't support ES modules.
+  const loaderPath = path.join(os.tmpdir(), `az-devops-tools-${uuidv4()}.loader.cjs`);
+  await writeFile(loaderPath, `module.exports = { runAzInWorker: async (...args) => (await import(${JSON.stringify(import.meta.url)})).runAzInWorker(...args) };`);
+
+  const workers = workerFarm({ maxRetries: 0, }, loaderPath, ["runAzInWorker"]);
+  let promises: Promise<any>[] = [];
   for (const args of argSets) {
     promises.push(new Promise((resolve, reject) => {
       workers.runAzInWorker(args, options, (retVal: any) => (retVal instanceof Error) ? reject(retVal) : resolve(retVal));
@@ -50,6 +58,7 @@ export async function runAzParallel(argSets: string[][], options: Partial<AzOpti
     process.exit(1);
   }
   workerFarm.end(workers);
+  await unlink(loaderPath);
   return result;
 }
 

@@ -1,7 +1,7 @@
 
-import chalk = require("chalk");
-import * as YAML from "yaml";
-import { getAzConfig } from "../utils/AzUtils";
+import chalk from "chalk";
+import YAML from "yaml";
+import { getAzConfig } from "../utils/AzUtils.js";
 
 export const deleted = Symbol();
 export function isDeleted(v: ValueType): v is typeof deleted {

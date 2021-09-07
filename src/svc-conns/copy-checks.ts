@@ -1,6 +1,6 @@
-import { getAzConfig, runAzCommand, runAzParallel } from "../utils/AzUtils";
-import { promptToConfirm, startSpinner } from "../utils/MiscUtils";
-import chalk = require("chalk");
+import { getAzConfig, runAzCommand, runAzParallel } from "../utils/AzUtils.js";
+import { promptToConfirm, startSpinner } from "../utils/MiscUtils.js";
+import chalk from "chalk";
 
 export const command = "copy-checks <source> <partialTarget>";
 export const desc = chalk`Copies all checks from the <source> service connection to all service connections whose names contain <partialTarget>

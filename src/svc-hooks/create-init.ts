@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import * as fs from "fs";
 import { join } from "path";
-import * as YAML from "yaml";
+import YAML from "yaml";
 import { Scalar } from "yaml/types";
 
 class ValWithComment {

@@ -1,8 +1,8 @@
-import { runAzCommand, runAzParallel } from "../utils/AzUtils";
-import { promptToConfirm, startSpinner } from "../utils/MiscUtils";
-import { getVarGroups } from "./get";
-import chalk = require("chalk");
-import { VarGroupCollection } from "./VarGroupCollection";
+import { runAzCommand, runAzParallel } from "../utils/AzUtils.js";
+import { promptToConfirm, startSpinner } from "../utils/MiscUtils.js";
+import { getVarGroups } from "./get.js";
+import chalk from "chalk";
+import { VarGroupCollection } from "./VarGroupCollection.js";
 
 export const command = "auth <prefix> <email>";
 export const desc = "Grant a user access to a set of variable groups";

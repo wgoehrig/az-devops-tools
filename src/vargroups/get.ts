@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import { runAzCommand } from "../utils/AzUtils";
-import { startSpinner } from "../utils/MiscUtils";
-import { printTable } from "../utils/TableUtils";
-import { AzVarGroupJson, VarGroupCollection } from "./VarGroupCollection";
-import chalk = require("chalk");
+import { runAzCommand } from "../utils/AzUtils.js";
+import { startSpinner } from "../utils/MiscUtils.js";
+import { printTable } from "../utils/TableUtils.js";
+import { AzVarGroupJson, VarGroupCollection } from "./VarGroupCollection.js";
+import chalk from "chalk";
 
 export const command = "get <prefix>";
 export const desc = "Get a set of variable groups";
