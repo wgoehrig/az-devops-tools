@@ -10,7 +10,8 @@ import workerFarm from "worker-farm";
 import { startSpinner } from "./MiscUtils.js";
 import { v4 as uuidv4 } from "uuid";
 
-// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore 
 import { quoteForShell } from "puka";
 const execFile = util.promisify(child_process.execFile);
 const writeFile = util.promisify(fs.writeFile);
