@@ -1,7 +1,14 @@
 const header = `#!/usr/bin/env node
 const require = (await import("module")).createRequire(import.meta.url);`;
 
-require('esbuild').buildSync({
+const watch = process.argv.includes("--watch") && {
+  onRebuild(error, result) {
+    if (error) console.error('watch build failed:', error)
+    else console.log('Rebuild succeeded.')
+  }
+}
+
+require('esbuild').build({
   entryPoints: ['src/index.ts'],
   bundle: true,
   banner: {
@@ -13,5 +20,10 @@ require('esbuild').buildSync({
   target: ['node14.17'],
   external: ["worker-farm", "node:*"],
   outfile: 'dist/index.mjs',
-  sourcemap: true
-})
+  sourcemap: true,
+  watch
+}).then(() => {
+  console.log("Build complete.");
+  if (!!watch)
+    console.log("Watching for file changes.");
+});
