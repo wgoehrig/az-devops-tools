@@ -35,7 +35,7 @@ export async function runAzParallel(argSets: string[][], options: Partial<AzOpti
   await writeFile(loaderPath, `module.exports = { runAzInWorker: async (...args) => (await import(${JSON.stringify(import.meta.url)})).runAzInWorker(...args) };`);
 
   const workers = workerFarm({ maxRetries: 0, }, loaderPath, ["runAzInWorker"]);
-  let promises: Promise<any>[] = [];
+  const promises: Promise<any>[] = [];
   for (const args of argSets) {
     promises.push(new Promise((resolve, reject) => {
       workers.runAzInWorker(args, options, (retVal: any) => (retVal instanceof Error) ? reject(retVal) : resolve(retVal));

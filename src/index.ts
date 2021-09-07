@@ -28,4 +28,4 @@ if (!require.main) {
     .argv;
 }
 
-export { runAzInWorker } from "./utils/AzUtils.js"
+export { runAzInWorker } from "./utils/AzUtils.js";

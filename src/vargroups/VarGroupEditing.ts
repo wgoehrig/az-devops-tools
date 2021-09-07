@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import util from "util";
-import { AzVarGroupJson, displayValue, isDeleted, rawValue, ValueType, VarGroupCollection } from "./VarGroupCollection.js";
+import { displayValue, isDeleted, rawValue, ValueType, VarGroupCollection } from "./VarGroupCollection.js";
 
 export function findChanges(oldVars: VarGroupCollection, newVars: VarGroupCollection): VarGroupCollectionChanges {
   const groupAliases = new Set(newVars.aliases);

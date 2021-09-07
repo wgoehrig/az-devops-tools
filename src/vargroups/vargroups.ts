@@ -4,8 +4,8 @@ import * as auth from "./auth.js";
 import chalk from "chalk";
 import { YargsArgv } from "../utils/MiscUtils.js";
 
-export const command = "vargroups <command>"
-export const desc = "Manage collections of related pipeline variable groups"
+export const command = "vargroups <command>";
+export const desc = "Manage collections of related pipeline variable groups";
 
 let yargs: import("yargs").Argv;
 
