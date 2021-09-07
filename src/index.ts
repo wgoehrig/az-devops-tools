@@ -1,6 +1,6 @@
+import "source-map-support/register.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-require("source-map-support").install();
 
 import yargs from "yargs";
 import { fixYargsColors } from "./utils/YargsColors.js";

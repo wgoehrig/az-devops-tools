@@ -10,9 +10,8 @@ import workerFarm from "worker-farm";
 import { startSpinner } from "./MiscUtils.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const { quoteForShell } = require("puka");
+// @ts-ignore
+import { quoteForShell } from "puka";
 const execFile = util.promisify(child_process.execFile);
 const writeFile = util.promisify(fs.writeFile);
 const unlink = util.promisify(fs.unlink);
