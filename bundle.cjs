@@ -8,7 +8,7 @@ require('esbuild').buildSync({
     js: header,
   },
   format: "esm",
-  minifyWhitespace: false,
+  minifyWhitespace: true,
   platform: 'node',
   target: ['node14.17'],
   external: ["worker-farm", "node:*"],
