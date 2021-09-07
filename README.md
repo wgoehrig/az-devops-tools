@@ -1,6 +1,6 @@
-![NPM version](https://img.shields.io/npm/v/az-devops-tools)
-![Node version](https://img.shields.io/node/v/az-devops-tools)
-![License](https://img.shields.io/npm/l/az-devops-tools)
+[![NPM version](https://img.shields.io/npm/v/az-devops-tools.svg)](https://www.npmjs.org/package/az-devops-tools)
+[![Node version](https://img.shields.io/node/v/az-devops-tools)](package.json)
+[![License](https://img.shields.io/npm/l/az-devops-tools.svg)](LICENSE)
 
 # az-devops-tools
 
