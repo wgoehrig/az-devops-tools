@@ -1,7 +1,7 @@
 {
   "name": "az-devops-tools",
   "description": "Tools that wrap the az CLI to make certain DevOps tasks a bit less painful.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Bill Goehrig",
   "license": "MIT",
   "engines": {
@@ -17,8 +17,8 @@
   "main": "lib/index.js",
   "type": "module",
   "bin": {
-    "az-devops-tools": "dist/index.js",
-    "azdt": "dist/index.js"
+    "az-devops-tools": "dist/index.mjs",
+    "azdt": "dist/index.mjs"
   },
   "repository": {
     "type": "git",
