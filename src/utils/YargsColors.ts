@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import yargs = require("yargs");
 
 const locale: any = {
   "Commands:": chalk.cyan`Command Groups:`,
@@ -53,6 +52,6 @@ const locale: any = {
   "deprecated: %s": chalk.bold.red`deprecated: %s`
 };
 
-export function fixYargsColors() {
+export function fixYargsColors(yargs: import("yargs").Argv) {
   yargs.updateLocale(locale);
 }

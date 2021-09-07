@@ -1,9 +1,11 @@
-name: Build steps
+name: CI Build
 on:
   push:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -15,4 +17,4 @@ jobs:
           node-version: '14'
       - run: npm ci
       - run: npm run lint
-        continue-on-error: true
+      - run: npm run build

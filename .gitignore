@@ -104,7 +104,8 @@ dist
 
 lib
 
-# Files created by `svc-hooks *-init`
-get*.yaml
-edit.yaml
-create.yaml
+# Temp files often created while testing
+*.yaml
+
+# Need to explicitly re-enable other YAML files
+!.github/*/*.yaml

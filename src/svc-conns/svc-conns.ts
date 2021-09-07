@@ -1,15 +1,18 @@
-import * as copyChecks from "./copy-checks";
-import yargs = require("yargs");
+import * as copyChecks from "./copy-checks.js";
 import chalk from "chalk";
+import { YargsArgv } from "../utils/MiscUtils.js";
 
 export const command = "svc-conns <command>";
 export const desc = "Manage collections of related service connections";
-export function builder(yargs: import("yargs").Argv) {
-  return yargs
-    .updateStrings({"Commands:": chalk.cyan`Commands:`})
+let yargs: import("yargs").Argv;
+
+export function builder(y: import("yargs").Argv) {
+  yargs = y;
+  return y.updateStrings({"Commands:": chalk.cyan`Commands:`})
     .command(copyChecks);
 }
-export function handler(argv: import("yargs").Argv) {
+
+export function handler(argv: YargsArgv<typeof builder>) {
   yargs.showHelp();
   console.error(chalk.bold.red`Unknown command: ${argv.command}`);
 }

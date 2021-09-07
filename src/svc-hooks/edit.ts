@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import * as fs from "fs";
-import * as YAML from "yaml";
-import { runAzParallel } from "../utils/AzUtils";
-import { startSpinner } from "../utils/MiscUtils";
-import { HookFormattedData } from "./Types";
+import YAML from "yaml";
+import { runAzParallel } from "../utils/AzUtils.js";
+import { startSpinner } from "../utils/MiscUtils.js";
+import { HookFormattedData } from "./Types.js";
 
 export const command = "edit <file>";
 export const desc =

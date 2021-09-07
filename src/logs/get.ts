@@ -1,10 +1,6 @@
-import { getAzConfig, runAzCommand, runAzParallel } from "../utils/AzUtils";
-import { promptToConfirm, startSpinner } from "../utils/MiscUtils";
-import util = require("util");
-import chalk = require("chalk");
-import path = require("path");
-import fs = require("fs");
-import { Argv } from "yargs";
+import chalk from "chalk";
+import { getAzConfig, runAzCommand, runAzParallel } from "../utils/AzUtils.js";
+import { startSpinner } from "../utils/MiscUtils.js";
 
 export const command = "get <url>";
 export const desc = "Finds and summarizes all failures in a given pipeline run";

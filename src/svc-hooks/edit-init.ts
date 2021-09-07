@@ -1,10 +1,10 @@
 import chalk from "chalk";
 import * as fs from "fs";
 import { join } from "path";
-import * as YAML from "yaml";
-import { validEventTypes } from "./EventTypes";
-import { getServiceHooks } from "./get";
-import { HookData, HookFormattedData } from "./Types";
+import YAML from "yaml";
+import { validEventTypes } from "./EventTypes.js";
+import { getServiceHooks } from "./get.js";
+import { HookData, HookFormattedData } from "./Types.js";
 
 export const command = "edit-init [options]";
 export const desc = "Initialize template YAML file for editing service hooks";

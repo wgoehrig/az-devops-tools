@@ -1,10 +1,10 @@
 import * as fs from "fs";
-import { getVarGroups } from "./get";
-import { runAzCommand, runAzParallel } from "../utils/AzUtils";
-import { promptToConfirm } from "../utils/MiscUtils";
-import { isDeleted, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCollection";
-import { findChanges, printChangeSummary } from "./VarGroupEditing";
-import chalk = require("chalk");
+import { getVarGroups } from "./get.js";
+import { runAzCommand, runAzParallel } from "../utils/AzUtils.js";
+import { promptToConfirm } from "../utils/MiscUtils.js";
+import { isDeleted, rawValue, SecretVal, VarGroupCollection } from "./VarGroupCollection.js";
+import { findChanges, printChangeSummary } from "./VarGroupEditing.js";
+import chalk from "chalk";
 
 export const command = "apply <yaml>";
 export const desc = "Update a set of variable groups";

@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import * as fs from "fs";
-import * as YAML from "yaml";
-import { runAzCommand, runAzParallel } from "../utils/AzUtils";
-import { startSpinner } from "../utils/MiscUtils";
-import { HookInput, ProjectData, RepoData } from "./Types";
+import YAML from "yaml";
+import { runAzCommand, runAzParallel } from "../utils/AzUtils.js";
+import { startSpinner } from "../utils/MiscUtils.js";
+import { HookInput, ProjectData, RepoData } from "./Types.js";
 
 
 export const command = "create <file>";

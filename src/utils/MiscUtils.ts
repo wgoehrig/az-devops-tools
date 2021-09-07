@@ -1,5 +1,5 @@
-import chalk = require("chalk");
-import ora = require("ora");
+import chalk from "chalk";
+import ora from "ora";
 
 export function startSpinner(text: string) {
   return ora({
@@ -25,3 +25,5 @@ export async function promptToConfirm() {
     process.exit(1);
   }
 }
+
+export type YargsArgv<T extends (...args: any) => any> = ReturnType<T>["argv"] & { command?: string };

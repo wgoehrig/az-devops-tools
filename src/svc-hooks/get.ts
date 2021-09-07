@@ -1,11 +1,11 @@
 import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
-import * as YAML from "yaml";
-import { runAzCommand } from "../utils/AzUtils";
-import { startSpinner } from "../utils/MiscUtils";
-import { validEventTypes } from "./EventTypes";
-import { HookData } from "./Types";
+import YAML from "yaml";
+import { runAzCommand } from "../utils/AzUtils.js";
+import { startSpinner } from "../utils/MiscUtils.js";
+import { validEventTypes } from "./EventTypes.js";
+import { HookData } from "./Types.js";
 
 
 export const command = "get [options]";
