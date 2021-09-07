@@ -7,7 +7,7 @@ import { HookFormattedData } from "./Types";
 
 export const command = "edit <file>";
 export const desc =
-  "Edit a set of service hooks. Use svc-hooks edit-init to generate starter";
+  "Edit service hook(s) from a supplied YAML file";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs.positional("file", {
     alias: "F",
@@ -24,12 +24,12 @@ export async function handler(argv: any) {
   // Parse service hook file contents
   const hookData: HookFormattedData[] = YAML.parse(fileContents);
 
-  const spinner = startSpinner("Preparing service hooks and looking up any missing required data...");
+  const spinner = startSpinner("Preparing service hooks...");
   // Prepare our az commands.
   const azCommands: string[][] = [];
   await Promise.all(
     hookData.map(async (hook: HookFormattedData) => {
-      // Check if hook data is missing any data
+      // Check if hook data is missing any data. No need to type-check, since az's payload type is identical to the request payload type.
       if (
         !hook.consumerActionId ||
         !hook.consumerId ||
@@ -74,4 +74,5 @@ export async function handler(argv: any) {
   spinner.text = chalk`Updating ${azCommands.length} service hooks...via {bold az devops invoke}`;
   await runAzParallel(azCommands, { inFile: true });
   spinner.stop();
+  console.log(chalk.green`Successfully edited some service hooks`);
 }

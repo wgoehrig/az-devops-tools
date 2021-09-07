@@ -1,10 +1,29 @@
+import chalk from "chalk";
 import * as fs from "fs";
 import { join } from "path";
 import * as YAML from "yaml";
+import { Scalar } from "yaml/types";
 
+class ValWithComment {
+  // Required for adding comments to YAML file
+  constructor(public value: any, public comment: string) {}
+}
+const commentYamlTag = {
+  // Required for adding comments to YAML file
+  identify: (value: any) => value instanceof ValWithComment,
+  tag: "",
+  createNode: (_schema: any, v: ValWithComment, _ctx: any) => {
+    const n = new Scalar(v.value);
+    n.comment = v.comment;
+    return n;
+  },
+  resolve(_doc: any, _cst: any) {
+    throw Error("not for parsing, just stringify!");
+  },
+};
 
-export const command = "create-init";
-export const desc = "Initialize the YAML file for creating service hooks";
+export const command = "create-init [options]";
+export const desc = "Initialize template YAML file for creating service hooks";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs.option("outDir", {
     alias: "o",
@@ -22,8 +41,12 @@ export function handler(argv: any) {
       eventType: "build.complete",
       url: null,
       eventSpecificArgs: {
-        definitionName: null,
-        buildStatus: null,
+        pipelineName: new ValWithComment(null, " '' | <pipeline-name>"),
+        buildStatus: new ValWithComment(
+          null,
+          " '' | Succeeded | PartiallySucceeded | Failed | Stopped"
+        ),
+        acceptUntrustedCerts: new ValWithComment(true, " true | false"),
         publisherId: "tfs",
       },
     },
@@ -33,9 +56,17 @@ export function handler(argv: any) {
       eventType: "ms.vss-pipelines.stage-state-changed-event",
       url: null,
       eventSpecificArgs: {
-        pipelineId: null,
-        stageNameId: null,
-        stageStateId: null,
+        buildDefinitionId: new ValWithComment(
+          null,
+          " https://dev.azure.com/<organization>/<project></project>/_build?definitionId=<buildDefinitionId>"
+        ),
+        stageNameId: new ValWithComment("", " '' | __default | <stage-name>"),
+        stageStateId: new ValWithComment(
+          "",
+          " '' | NotStarted | Waiting | Running | Completed"
+        ),
+        stageResultId: "",
+        acceptUntrustedCerts: new ValWithComment(true, " true | false"),
         publisherId: "pipelines",
       },
     },
@@ -45,20 +76,25 @@ export function handler(argv: any) {
       eventType: "git.push",
       url: null,
       eventSpecificArgs: {
-        repoName: null,
-        branch: null,
-        pushedBy: null,
+        repoName: new ValWithComment(null, " '' | <repo-name>"),
+        branch: new ValWithComment("", " '' | <branch-name>"),
+        pushedBy: "",
+        acceptUntrustedCerts: new ValWithComment(true, " true | false"),
         publisherId: "tfs",
       },
     },
   ];
 
   // Write sample to output file
-  const fPath = join(argv.outDir, `create.${argv.outType}`);
+  const fPath = join(argv.outDir, "create.yaml");
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
   }
 
   // Format the output data correctly, depending on file type
-  fs.writeFileSync(fPath, YAML.stringify(sampleJSON));
+  fs.writeFileSync(
+    fPath,
+    YAML.stringify(sampleJSON, { customTags: [commentYamlTag] })
+  ); // customTags required for adding comments into YAML file
+  console.log(chalk.green`Template YAML at`, chalk.dim.underline`${fPath}`);
 }

@@ -103,3 +103,8 @@ dist
 .tern-port
 
 lib
+
+# Files created by `svc-hooks *-init`
+get*.yaml
+edit.yaml
+create.yaml

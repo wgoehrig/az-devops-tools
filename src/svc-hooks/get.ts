@@ -8,8 +8,8 @@ import { validEventTypes } from "./EventTypes";
 import { HookData } from "./Types";
 
 
-export const command = "get";
-export const desc = "Get a set of service hooks";
+export const command = "get [options]";
+export const desc = "Get service hook(s)";
 export const builder = (yargs: import("yargs").Argv) =>
   yargs
     .option("event", {
@@ -57,7 +57,7 @@ export async function handler(argv: any) {
   // Write the output to file
   const fPath = path.join(
     argv.outDir,
-    `get${argv.event ? `_${argv.event}` : ""}.${argv.outType}`
+    `get${argv.event ? `_${argv.event}` : ""}.yaml`
   );
   if (!fs.existsSync(argv.outDir)) {
     fs.mkdirSync(argv.outDir);
